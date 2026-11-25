@@ -88,7 +88,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenResume }) 
                   rel={btn.external ? 'noopener noreferrer' : undefined}
                   aria-label={btn.label}
                   title={btn.label}
-                  className="w-10 h-10 rounded-lg bg-[#4A6B7C]/80 hover:bg-[#5E8498] border border-white/15 text-white flex items-center justify-center transition-colors"
+                  className="w-10 h-10 rounded-lg bg-[#18181B] hover:bg-white/[0.08] border border-white/15 text-white flex items-center justify-center transition-colors"
                 >
                   <Icon size={17} strokeWidth={1.75} />
                 </a>
@@ -99,7 +99,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenResume }) 
               onClick={onOpenResume}
               aria-label="Download Resume / CV"
               title="Download Resume / CV"
-              className="h-10 px-3.5 rounded-lg bg-[#4A6B7C]/80 hover:bg-[#5E8498] border border-white/15 text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors"
+              className="h-10 px-3.5 rounded-lg bg-[#18181B] hover:bg-white/[0.08] border border-white/15 text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors"
             >
               <FileDown size={15} strokeWidth={1.75} />
               <span className="hidden sm:inline">CV</span>

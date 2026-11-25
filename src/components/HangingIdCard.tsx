@@ -177,23 +177,33 @@ export const HangingIdCard: React.FC = () => {
         aria-hidden="true"
       >
         <defs>
-          <linearGradient id="slateRibbon" gradientUnits="userSpaceOnUse" x1="149" y1="0" x2="171" y2="0">
-            <stop offset="0%" stopColor="#4B6C80" />
-            <stop offset="50%" stopColor="#6D91A6" />
-            <stop offset="100%" stopColor="#466578" />
+          <linearGradient id="darkRibbon" gradientUnits="userSpaceOnUse" x1="149" y1="0" x2="171" y2="0">
+            <stop offset="0%" stopColor="#1A1A1F" />
+            <stop offset="45%" stopColor="#222228" />
+            <stop offset="100%" stopColor="#1A1A1F" />
           </linearGradient>
         </defs>
         <path
           id="lanyardSpine"
           ref={ribbonRef}
           d="M 160 0 Q 160 84 160 168"
-          stroke="url(#slateRibbon)"
+          stroke="url(#darkRibbon)"
           strokeWidth="22"
           strokeLinecap="butt"
         />
+        {/* Yellow centre stripe on lanyard */}
+        <path
+          d="M 160 0 Q 160 84 160 168"
+          stroke="#FACC15"
+          strokeWidth="3.5"
+          strokeOpacity="0.75"
+          strokeLinecap="butt"
+          strokeDasharray="6 8"
+        />
         <text
-          fill="#0B1117"
-          fontSize="7.5"
+          fill="#FACC15"
+          fillOpacity="0.55"
+          fontSize="7"
           fontWeight="800"
           letterSpacing="1.8"
           dominantBaseline="central"
@@ -221,8 +231,8 @@ export const HangingIdCard: React.FC = () => {
           <div className="w-4 h-4 -mt-0.5 rounded-b-md bg-gradient-to-b from-zinc-300 to-zinc-600 border border-white/40 shadow-md" />
         </div>
 
-        {/* Frosted Slate-Blue Polycarbonate Card */}
-        <div className="relative rounded-[18px] bg-gradient-to-br from-[#7B9BAE]/90 via-[#5D7E93]/85 to-[#446173]/90 backdrop-blur-md border border-white/25 p-3.5 pt-3 shadow-[0_28px_60px_-14px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.3)] overflow-hidden">
+        {/* Dark Polycarbonate Card — site theme */}
+        <div className="relative rounded-[18px] bg-gradient-to-b from-[#1E1E24] to-[#131318] backdrop-blur-md border border-white/[0.18] p-3.5 pt-3 shadow-[0_28px_60px_-14px_rgba(0,0,0,0.92),inset_0_1px_0_rgba(255,255,255,0.12)] overflow-hidden">
           <div ref={sheenRef} className="absolute inset-0 pointer-events-none z-10" />
 
           {/* Subtle Topographic Curves */}
@@ -237,11 +247,11 @@ export const HangingIdCard: React.FC = () => {
           </svg>
 
           {/* Top Punched Slot */}
-          <div className="mx-auto w-9 h-1.5 rounded-full bg-[#111111]/70 border border-white/20 mb-2.5" />
+          <div className="mx-auto w-9 h-1.5 rounded-full bg-[#09090B] border border-white/15 mb-2.5" />
 
           {/* Stacked Bold Name */}
           <div className="relative leading-[0.95] tracking-tight mb-2">
-            <div className="text-[19px] font-extrabold text-[#111111] uppercase">
+            <div className="text-[19px] font-extrabold text-[#FACC15] uppercase">
               SUJAN
             </div>
             <div className="text-[19px] font-extrabold text-white uppercase">
@@ -262,7 +272,7 @@ export const HangingIdCard: React.FC = () => {
           {/* Bottom ID & Barcode Strip */}
           <div className="relative mt-2.5 pt-1 flex items-end justify-between gap-2">
             <div>
-              <div className="text-[8px] font-mono text-[#111111]/80 font-semibold mb-1">
+              <div className="text-[8px] font-mono text-white/50 font-semibold mb-1">
                 ID: 0006
               </div>
               <div className="flex items-end gap-[1.5px]" aria-hidden="true">
@@ -270,16 +280,16 @@ export const HangingIdCard: React.FC = () => {
                   <span
                     key={i}
                     style={{ width: `${w * 1.8}px` }}
-                    className="h-4 bg-[#111111]/90"
+                    className="h-4 bg-white/75"
                   />
                 ))}
               </div>
             </div>
             <div className="text-right leading-tight">
-              <div className="text-[8px] font-bold uppercase tracking-wider text-[#111111]/85">
+              <div className="text-[8px] font-bold uppercase tracking-wider text-[#FACC15]/80">
                 VFX / EDIT
               </div>
-              <div className="text-[7px] font-semibold uppercase tracking-wider text-[#111111]/65">
+              <div className="text-[7px] font-semibold uppercase tracking-wider text-[#FACC15]/50">
                 DEPT
               </div>
             </div>
