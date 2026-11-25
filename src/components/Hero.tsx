@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Film, Play } from 'lucide-react';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
+import { BackgroundLines } from './ui/background-lines';
 
 interface HeroProps {
   onPlayReel: (youtubeId: string, title: string) => void;
@@ -180,9 +181,13 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
   }, [entered]);
 
   return (
+    <BackgroundLines
+      svgOptions={{ duration: 10 }}
+      className="relative min-h-[100dvh] md:min-h-0"
+    >
     <section
       id="hero"
-      className="relative min-h-[100dvh] md:min-h-0 flex flex-col justify-between md:justify-start pt-20 pb-6 sm:pt-28 sm:pb-12 overflow-hidden"
+      className="relative flex flex-col justify-between md:justify-start pt-20 pb-6 sm:pt-28 sm:pb-12 overflow-hidden"
     >
       <div className="w-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 xl:px-20 relative flex-1 flex flex-col justify-between md:block">
         {/* Left Floating Cursor Badge */}
@@ -398,5 +403,6 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
         </div>
       </div>
     </section>
+    </BackgroundLines>
   );
 };
