@@ -40,6 +40,8 @@ export interface SkillCategory {
 }
 
 export const PORTFOLIO_DATA = {
+  // Paste your public Google Sheet URL here (or set VITE_GOOGLE_SHEET_URL in .env / Vercel)
+  googleSheetUrl: import.meta.env.VITE_GOOGLE_SHEET_URL || '',
   personal: {
     name: 'Sujan Kumar M.V',
     title: 'AI Animator • Video Editor • Graphic Designer • VFX Artist',

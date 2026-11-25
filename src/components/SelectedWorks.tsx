@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { PORTFOLIO_DATA, type ProjectItem } from '../data/portfolioData';
+import { fetchProjectsFromGoogleSheet } from '../utils/googleSheetProjects';
 
 interface SelectedWorksProps {
   onPlayVideo: (youtubeId: string, title: string) => void;
@@ -9,8 +10,25 @@ interface SelectedWorksProps {
 type GalleryChip = 'all' | 'vfx' | 'video';
 
 export const SelectedWorks: React.FC<SelectedWorksProps> = ({ onPlayVideo }) => {
+  const [projects, setProjects] = useState<ProjectItem[]>(PORTFOLIO_DATA.projects);
   const [activeChip, setActiveChip] = useState<GalleryChip>('all');
   const [activeIndex, setActiveIndex] = useState<number>(0);
+
+  useEffect(() => {
+    if (!PORTFOLIO_DATA.googleSheetUrl) return;
+    const controller = new AbortController();
+    fetchProjectsFromGoogleSheet(PORTFOLIO_DATA.googleSheetUrl, controller.signal)
+      .then((sheetProjects) => {
+        if (sheetProjects && sheetProjects.length > 0) {
+          setProjects(sheetProjects);
+          setActiveIndex(0);
+        }
+      })
+      .catch(() => {
+        // Keep fallback PORTFOLIO_DATA.projects silently if offline or sheet unavailable
+      });
+    return () => controller.abort();
+  }, []);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const maskGroupRef = useRef<SVGGElement>(null);
@@ -20,10 +38,10 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({ onPlayVideo }) => 
   const stripContainerRef = useRef<HTMLDivElement>(null);
   const stripCardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const vfxProjects: ProjectItem[] = PORTFOLIO_DATA.projects.filter(
+  const vfxProjects: ProjectItem[] = projects.filter(
     (p) => p.category === 'CGI & Gaming' || p.category === 'Bollywood'
   );
-  const videoEditProjects: ProjectItem[] = PORTFOLIO_DATA.projects.filter(
+  const videoEditProjects: ProjectItem[] = projects.filter(
     (p) => p.category === 'Reels' || p.category === 'Commercials'
   );
 
@@ -32,7 +50,7 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({ onPlayVideo }) => 
       ? vfxProjects
       : activeChip === 'video'
         ? videoEditProjects
-        : PORTFOLIO_DATA.projects;
+        : projects;
 
   const activeProject = currentGallery[activeIndex] || currentGallery[0];
 
@@ -158,7 +176,7 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({ onPlayVideo }) => 
                       : 'bg-white/10 backdrop-blur-md text-white/80 hover:text-white border border-white/15'
                   }`}
                 >
-                  All ({PORTFOLIO_DATA.projects.length})
+                  All ({projects.length})
                 </button>
                 <button
                   type="button"
