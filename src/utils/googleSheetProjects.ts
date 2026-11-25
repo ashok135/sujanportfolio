@@ -41,15 +41,17 @@ function buildSheetFeedUrl(sheetUrlOrId: string): string | null {
   return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json${gidParam}`;
 }
 
-function normalizeCategory(raw: string): ProjectItem['category'] {
-  const v = raw.toLowerCase();
-  if (v.includes('bollywood')) return 'Bollywood';
-  if (v.includes('vfx') || v.includes('cgi') || v.includes('3d') || v.includes('maya') || v.includes('nuke')) {
-    return 'CGI & Gaming';
+function normalizeCategory(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return 'Video Editing';
+  const v = trimmed.toLowerCase();
+  if (v === 'vfx' || v === 'vfx & cgi' || v === 'cgi & gaming' || v === 'bollywood') {
+    return 'VFX & CGI';
   }
-  if (v.includes('commercial') || v.includes('ad')) return 'Commercials';
-  if (v.includes('ai')) return 'AI Generation';
-  return 'Reels';
+  if (v === 'video' || v === 'video editing' || v === 'reels' || v === 'commercials') {
+    return 'Video Editing';
+  }
+  return trimmed;
 }
 
 interface GvizCell {

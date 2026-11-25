@@ -1,7 +1,7 @@
 export interface ProjectItem {
   id: string;
   title: string;
-  category: 'Reels' | 'Bollywood' | 'CGI & Gaming' | 'Commercials' | 'AI Generation';
+  category: string;
   categoryLabel: string;
   youtubeId?: string;
   youtubeUrl?: string;

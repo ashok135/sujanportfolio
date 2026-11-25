@@ -7,11 +7,15 @@ interface SelectedWorksProps {
   onPlayVideo: (youtubeId: string, title: string) => void;
 }
 
-type GalleryChip = 'all' | 'vfx' | 'video';
+function getCategoryGroup(category: string): string {
+  if (category === 'CGI & Gaming' || category === 'Bollywood') return 'VFX & CGI';
+  if (category === 'Reels' || category === 'Commercials') return 'Video Editing';
+  return category.trim() || 'Video Editing';
+}
 
 export const SelectedWorks: React.FC<SelectedWorksProps> = ({ onPlayVideo }) => {
   const [projects, setProjects] = useState<ProjectItem[]>(PORTFOLIO_DATA.projects);
-  const [activeChip, setActiveChip] = useState<GalleryChip>('all');
+  const [activeChip, setActiveChip] = useState<string>('All');
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
   useEffect(() => {
@@ -21,6 +25,7 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({ onPlayVideo }) => 
       .then((sheetProjects) => {
         if (sheetProjects && sheetProjects.length > 0) {
           setProjects(sheetProjects);
+          setActiveChip('All');
           setActiveIndex(0);
         }
       })
@@ -38,23 +43,16 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({ onPlayVideo }) => 
   const stripContainerRef = useRef<HTMLDivElement>(null);
   const stripCardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const vfxProjects: ProjectItem[] = projects.filter(
-    (p) => p.category === 'CGI & Gaming' || p.category === 'Bollywood'
-  );
-  const videoEditProjects: ProjectItem[] = projects.filter(
-    (p) => p.category === 'Reels' || p.category === 'Commercials'
-  );
+  const categoryGroups = Array.from(new Set(projects.map((p) => getCategoryGroup(p.category))));
 
   const currentGallery =
-    activeChip === 'vfx'
-      ? vfxProjects
-      : activeChip === 'video'
-        ? videoEditProjects
-        : projects;
+    activeChip === 'All'
+      ? projects
+      : projects.filter((p) => getCategoryGroup(p.category) === activeChip);
 
   const activeProject = currentGallery[activeIndex] || currentGallery[0];
 
-  const handleSelectChip = (chip: GalleryChip) => {
+  const handleSelectChip = (chip: string) => {
     setActiveChip(chip);
     setActiveIndex(0);
   };
@@ -168,40 +166,35 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({ onPlayVideo }) => 
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5" role="group" aria-label="Work galleries">
                 <button
                   type="button"
-                  onClick={() => handleSelectChip('all')}
-                  aria-pressed={activeChip === 'all'}
+                  onClick={() => handleSelectChip('All')}
+                  aria-pressed={activeChip === 'All'}
                   className={`px-5 py-2 rounded-full text-xs font-medium transition-colors min-h-[38px] ${
-                    activeChip === 'all'
+                    activeChip === 'All'
                       ? 'bg-white text-[#111111]'
                       : 'bg-white/10 backdrop-blur-md text-white/80 hover:text-white border border-white/15'
                   }`}
                 >
                   All ({projects.length})
                 </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectChip('vfx')}
-                  aria-pressed={activeChip === 'vfx'}
-                  className={`px-5 py-2 rounded-full text-xs font-medium transition-colors min-h-[38px] ${
-                    activeChip === 'vfx'
-                      ? 'bg-white text-[#111111]'
-                      : 'bg-white/10 backdrop-blur-md text-white/80 hover:text-white border border-white/15'
-                  }`}
-                >
-                  VFX &amp; CGI ({vfxProjects.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectChip('video')}
-                  aria-pressed={activeChip === 'video'}
-                  className={`px-5 py-2 rounded-full text-xs font-medium transition-colors min-h-[38px] ${
-                    activeChip === 'video'
-                      ? 'bg-white text-[#111111]'
-                      : 'bg-white/10 backdrop-blur-md text-white/80 hover:text-white border border-white/15'
-                  }`}
-                >
-                  Video Editing ({videoEditProjects.length})
-                </button>
+                {categoryGroups.map((group) => {
+                  const count = projects.filter((p) => getCategoryGroup(p.category) === group).length;
+                  const isActive = activeChip === group;
+                  return (
+                    <button
+                      key={group}
+                      type="button"
+                      onClick={() => handleSelectChip(group)}
+                      aria-pressed={isActive}
+                      className={`px-5 py-2 rounded-full text-xs font-medium transition-colors min-h-[38px] ${
+                        isActive
+                          ? 'bg-white text-[#111111]'
+                          : 'bg-white/10 backdrop-blur-md text-white/80 hover:text-white border border-white/15'
+                      }`}
+                    >
+                      {group} ({count})
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
