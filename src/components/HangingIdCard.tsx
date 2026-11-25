@@ -2,15 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
 
 /**
- * BadgeFolio-inspired 3D interactive hanging ID card with elastic lanyard physics.
- * Features 3D perspective tilt (rotateX/Y/Z), throwable spring-pendulum physics,
- * dynamic specular sheen, and a minimal photo-first layout.
+ * BadgeFolio-style hanging ID badge with printed lanyard strap, silver swivel clasp,
+ * frosted polycarbonate card, 3D perspective tilt, and elastic spring-pendulum physics.
  */
 export const HangingIdCard: React.FC = () => {
   const { personal } = PORTFOLIO_DATA;
   const cardRef = useRef<HTMLDivElement>(null);
   const ribbonRef = useRef<SVGPathElement>(null);
-  const ribbonHighlightRef = useRef<SVGPathElement>(null);
+  const ribbonTextPathRef = useRef<SVGTextPathElement>(null);
   const sheenRef = useRef<HTMLDivElement>(null);
 
   const [isDragging, setIsDragging] = useState(false);
@@ -34,16 +33,15 @@ export const HangingIdCard: React.FC = () => {
 
   useEffect(() => {
     let rafId = 0;
-    const anchorX = 170;
+    const anchorX = 160;
     const anchorY = 0;
-    const restClipY = 92;
+    const restClipY = 176;
 
     const step = () => {
       const p = phys.current;
       p.t += 0.022;
 
       if (!p.dragging) {
-        // Elastic spring return for X/Y translation
         const k = 0.11;
         const damp = 0.87;
         p.vx = (p.vx - p.x * k) * damp;
@@ -51,16 +49,14 @@ export const HangingIdCard: React.FC = () => {
         p.x += p.vx;
         p.y += p.vy;
 
-        // Pendulum angular spring coupled to horizontal acceleration
-        const targetZ = Math.max(-34, Math.min(34, p.x * 0.16 + p.vx * 0.7 + Math.sin(p.t) * 1.1));
+        const targetZ = Math.max(-32, Math.min(32, p.x * 0.16 + p.vx * 0.65 + Math.sin(p.t) * 1.1));
         p.vRotZ = (p.vRotZ + (targetZ - p.rotZ) * 0.14) * 0.84;
         p.rotZ += p.vRotZ;
       } else {
-        const targetZ = Math.max(-36, Math.min(36, p.x * 0.18 + p.vx * 0.65));
+        const targetZ = Math.max(-34, Math.min(34, p.x * 0.18 + p.vx * 0.6));
         p.rotZ += (targetZ - p.rotZ) * 0.25;
       }
 
-      // 3D perspective tilt based on drag offset and velocity
       const targetRotY = Math.max(-24, Math.min(24, p.x * 0.16 + p.vx * 0.5));
       const targetRotX = Math.max(-18, Math.min(18, -p.y * 0.12 - p.vy * 0.35));
       p.rotY += (targetRotY - p.rotY) * 0.2;
@@ -73,18 +69,17 @@ export const HangingIdCard: React.FC = () => {
       if (sheenRef.current) {
         const gx = 50 + p.rotY * 1.8;
         const gy = 30 - p.rotX * 1.8;
-        sheenRef.current.style.background = `radial-gradient(circle at ${gx.toFixed(1)}% ${gy.toFixed(1)}%, rgba(255,255,255,0.18) 0%, rgba(250,204,21,0.06) 30%, transparent 68%)`;
+        sheenRef.current.style.background = `radial-gradient(circle at ${gx.toFixed(1)}% ${gy.toFixed(1)}%, rgba(255,255,255,0.22) 0%, transparent 65%)`;
       }
 
-      // Attach ribbon seamlessly to the top clip center
       const endX = anchorX + p.x;
-      const endY = Math.max(20, restClipY + p.y);
-      const ctrlX = anchorX + p.x * 0.32;
+      const endY = Math.max(40, restClipY + p.y);
+      const ctrlX = anchorX + p.x * 0.35;
       const ctrlY = endY * 0.55;
       const pathD = `M ${anchorX} ${anchorY} Q ${ctrlX.toFixed(1)} ${ctrlY.toFixed(1)} ${endX.toFixed(1)} ${endY.toFixed(1)}`;
 
       if (ribbonRef.current) ribbonRef.current.setAttribute('d', pathD);
-      if (ribbonHighlightRef.current) ribbonHighlightRef.current.setAttribute('d', pathD);
+      if (ribbonTextPathRef.current) ribbonTextPathRef.current.setAttribute('href', '#lanyardSpine');
 
       rafId = requestAnimationFrame(step);
     };
@@ -101,11 +96,8 @@ export const HangingIdCard: React.FC = () => {
       const dx = e.clientX - p.startPX;
       const dy = e.clientY - p.startPY;
 
-      // Rubber-band resistance when pulled far
-      const rawX = p.startX + dx;
-      const rawY = p.startY + dy;
-      const nextX = Math.max(-150, Math.min(150, rawX * 0.92));
-      const nextY = Math.max(-45, Math.min(135, rawY * 0.9));
+      const nextX = Math.max(-150, Math.min(150, (p.startX + dx) * 0.92));
+      const nextY = Math.max(-55, Math.min(125, (p.startY + dy) * 0.9));
 
       p.vx = (nextX - p.x) * 0.55;
       p.vy = (nextY - p.y) * 0.55;
@@ -152,90 +144,122 @@ export const HangingIdCard: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full max-w-[340px] h-[430px] mx-auto select-none flex flex-col items-center">
-      {/* Top Anchor Grommet */}
-      <div className="w-10 h-1.5 rounded-full bg-white/20 z-10" />
-
-      {/* Printed Fabric Lanyard Ribbon */}
+    <div className="relative w-full max-w-[320px] h-[470px] mx-auto select-none flex flex-col items-center">
+      {/* Printed Lanyard Strap from Top Edge */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none overflow-visible"
-        viewBox="0 0 340 430"
+        viewBox="0 0 320 470"
         fill="none"
         aria-hidden="true"
       >
         <defs>
-          <linearGradient id="lanyardGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#1C1C21" />
-            <stop offset="50%" stopColor="#2E2E36" />
-            <stop offset="100%" stopColor="#18181B" />
+          <linearGradient id="slateRibbon" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#4F7084" />
+            <stop offset="50%" stopColor="#6B8FA4" />
+            <stop offset="100%" stopColor="#456375" />
           </linearGradient>
         </defs>
         <path
+          id="lanyardSpine"
           ref={ribbonRef}
-          d="M 170 0 Q 170 50 170 92"
-          stroke="url(#lanyardGrad)"
-          strokeWidth="22"
-          strokeLinecap="round"
+          d="M 160 0 Q 160 88 160 176"
+          stroke="url(#slateRibbon)"
+          strokeWidth="20"
+          strokeLinecap="butt"
         />
-        <path
-          ref={ribbonHighlightRef}
-          d="M 170 0 Q 170 50 170 92"
-          stroke="#FACC15"
-          strokeOpacity="0.45"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
+        <text
+          fill="#0F172A"
+          fontSize="7.5"
+          fontWeight="700"
+          letterSpacing="1.6"
+          dominantBaseline="central"
+        >
+          <textPath ref={ribbonTextPathRef} href="#lanyardSpine" startOffset="14%">
+            SUJAN KUMAR • SUJAN KUMAR •
+          </textPath>
+        </text>
       </svg>
 
-      {/* 3D Draggable ID Card */}
+      {/* 3D Draggable Badge */}
       <div
         ref={cardRef}
         onPointerDown={handlePointerDown}
         onMouseEnter={handleMouseEnter}
         style={{ transformOrigin: 'top center', transformStyle: 'preserve-3d' }}
-        className={`relative mt-[78px] w-[236px] touch-none will-change-transform ${
+        className={`relative mt-[162px] w-[212px] sm:w-[224px] touch-none will-change-transform ${
           isDragging ? 'cursor-grabbing' : 'cursor-grab'
         }`}
       >
-        {/* Realistic Metal Swivel Clasp */}
-        <div className="mx-auto flex flex-col items-center -mb-2 relative z-20 pointer-events-none">
-          <div className="w-6 h-3 rounded-t-md bg-gradient-to-b from-zinc-200 to-zinc-500 border border-white/50 shadow" />
-          <div className="w-3.5 h-3.5 -mt-0.5 rounded-full border-[2.5px] border-zinc-300 bg-[#111111] shadow-sm" />
-          <div className="w-8 h-3 -mt-1 rounded-sm bg-gradient-to-b from-zinc-300 to-zinc-600 border border-white/40 shadow-md" />
+        {/* Silver Ring & Swivel Clasp */}
+        <div className="mx-auto flex flex-col items-center -mb-2.5 relative z-20 pointer-events-none">
+          <div className="w-5 h-5 rounded-full border-[2.5px] border-zinc-300 bg-transparent shadow-sm" />
+          <div className="w-3 h-3 -mt-1 rounded-sm bg-gradient-to-b from-zinc-200 to-zinc-500 border border-white/50 shadow" />
+          <div className="w-4 h-4 -mt-0.5 rounded-b-md bg-gradient-to-b from-zinc-300 to-zinc-600 border border-white/40 shadow-md" />
         </div>
 
-        {/* Polycarbonate Badge Shell */}
-        <div className="relative rounded-[22px] bg-gradient-to-b from-[#1E1E22] to-[#131316] border border-white/20 p-3.5 pt-4 shadow-[0_30px_60px_-14px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.2)] overflow-hidden">
-          {/* Dynamic 3D Specular Sheen */}
+        {/* Frosted Slate-Blue Polycarbonate Card */}
+        <div className="relative rounded-[18px] bg-gradient-to-br from-[#7B9BAE]/90 via-[#5D7E93]/85 to-[#446173]/90 backdrop-blur-md border border-white/25 p-3.5 pt-3 shadow-[0_28px_60px_-14px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.3)] overflow-hidden">
+          {/* Dynamic Specular Sheen */}
           <div ref={sheenRef} className="absolute inset-0 pointer-events-none z-10" />
 
-          {/* Punched Slot */}
-          <div className="mx-auto w-11 h-1.5 rounded-full bg-[#09090B] border border-white/15 mb-3" />
+          {/* Subtle Topographic Curves */}
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none opacity-20"
+            viewBox="0 0 220 290"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path d="M-20 220 C 60 180, 140 260, 240 200" stroke="white" strokeWidth="1" />
+            <path d="M-20 245 C 70 205, 150 280, 240 225" stroke="white" strokeWidth="1" />
+          </svg>
 
-          {/* Sujan Photo */}
-          <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-[#0E0E10] border border-white/10">
+          {/* Top Punched Slot */}
+          <div className="mx-auto w-9 h-1.5 rounded-full bg-[#111111]/70 border border-white/20 mb-2.5" />
+
+          {/* Stacked Bold Name */}
+          <div className="relative leading-[0.95] tracking-tight mb-2">
+            <div className="text-[19px] font-extrabold text-[#111111] uppercase">
+              SUJAN
+            </div>
+            <div className="text-[19px] font-extrabold text-white uppercase">
+              KUMAR
+            </div>
+          </div>
+
+          {/* Portrait Photo */}
+          <div className="relative w-full aspect-[4/4.1] rounded-lg overflow-hidden bg-[#111111] border border-white/20 shadow-inner">
             <img
               src="/images/sujan-profile.jpg"
               alt={personal.name}
               draggable={false}
-              className="w-full h-full object-cover object-top pointer-events-none"
+              className="w-full h-full object-cover object-top grayscale contrast-110 pointer-events-none"
             />
           </div>
 
-          {/* Minimal Footer */}
-          <div className="relative pt-3.5 pb-0.5 flex items-center justify-between gap-2">
-            <div className="min-w-0">
-              <div className="text-[15px] font-semibold text-white leading-tight truncate">
-                {personal.name}
+          {/* Bottom ID & Barcode Strip */}
+          <div className="relative mt-2.5 pt-1 flex items-end justify-between gap-2">
+            <div>
+              <div className="text-[8px] font-mono text-[#111111]/80 font-semibold mb-1">
+                ID: 0006
               </div>
-              <div className="text-[11px] text-[#FACC15] font-medium mt-0.5 truncate">
-                Video Editor &amp; VFX
+              <div className="flex items-end gap-[1.5px]" aria-hidden="true">
+                {[3, 1, 2, 1, 3, 1, 2, 2, 1, 3, 1, 2, 1, 2, 3].map((w, i) => (
+                  <span
+                    key={i}
+                    style={{ width: `${w * 1.8}px` }}
+                    className="h-4 bg-[#111111]/90"
+                  />
+                ))}
               </div>
             </div>
-            <span
-              title="Available for work"
-              className="shrink-0 w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"
-            />
+            <div className="text-right leading-tight">
+              <div className="text-[8px] font-bold uppercase tracking-wider text-[#111111]/85">
+                VFX / EDIT
+              </div>
+              <div className="text-[7px] font-semibold uppercase tracking-wider text-[#111111]/65">
+                DEPT
+              </div>
+            </div>
           </div>
         </div>
       </div>
