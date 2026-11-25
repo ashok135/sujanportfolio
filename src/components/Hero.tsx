@@ -107,11 +107,6 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
   const { personal } = PORTFOLIO_DATA;
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const mobileCardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const heroInnerRef = useRef<HTMLDivElement | null>(null);
-  const leftCursorRef = useRef<SVGSVGElement | null>(null);
-  const rightCursorRef = useRef<SVGSVGElement | null>(null);
-  const premiereHoveredRef = useRef(false);
-  const mayaHoveredRef = useRef(false);
   const [entered, setEntered] = useState(false);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
@@ -184,114 +179,28 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
     };
   }, [entered]);
 
-  // Independent roaming pointer symbols: hover Premiere Pro or Maya & VFX chip -> its pointer roams home screen; unhover -> returns
-  useEffect(() => {
-    const container = heroInnerRef.current;
-    if (!container) return;
-
-    let curLX = 0;
-    let curLY = 0;
-    let curRX = 0;
-    let curRY = 0;
-    let tL = 0;
-    let tR = 0;
-    let rafId = 0;
-
-    const animate = () => {
-      const rect = container.getBoundingClientRect();
-      const roamW = Math.max(rect.width * 0.72, 260);
-      const roamH = Math.max(rect.height * 0.55, 220);
-
-      let targetLX = 0;
-      let targetLY = 0;
-      if (premiereHoveredRef.current) {
-        tL += 0.025;
-        targetLX = roamW * (0.48 + 0.42 * Math.sin(tL * 1.1));
-        targetLY = roamH * (0.35 + 0.45 * Math.sin(tL * 1.7 + 0.6));
-      }
-
-      let targetRX = 0;
-      let targetRY = 0;
-      if (mayaHoveredRef.current) {
-        tR += 0.025;
-        targetRX = -roamW * (0.48 + 0.42 * Math.sin(tR * 1.15));
-        targetRY = roamH * (0.25 + 0.45 * Math.cos(tR * 1.6 + 0.4));
-      }
-
-      curLX += (targetLX - curLX) * 0.065;
-      curLY += (targetLY - curLY) * 0.065;
-      curRX += (targetRX - curRX) * 0.065;
-      curRY += (targetRY - curRY) * 0.065;
-
-      if (leftCursorRef.current) {
-        leftCursorRef.current.style.transform = `translate3d(${curLX.toFixed(2)}px, ${curLY.toFixed(2)}px, 0)`;
-      }
-      if (rightCursorRef.current) {
-        rightCursorRef.current.style.transform = `translate3d(${curRX.toFixed(2)}px, ${curRY.toFixed(2)}px, 0)`;
-      }
-
-      rafId = requestAnimationFrame(animate);
-    };
-
-    rafId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafId);
-  }, []);
-
   return (
     <section
       id="hero"
       className="relative min-h-[100dvh] md:min-h-0 flex flex-col justify-between md:justify-start pt-20 pb-6 sm:pt-28 sm:pb-12 overflow-hidden"
     >
-      <div
-        ref={heroInnerRef}
-        className="w-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 xl:px-20 relative flex-1 flex flex-col justify-between md:block"
-      >
-        {/* Left Floating Chip + Roaming Mouse Pointer Symbol */}
-        <div
-          onMouseEnter={() => {
-            premiereHoveredRef.current = true;
-          }}
-          onMouseLeave={() => {
-            premiereHoveredRef.current = false;
-          }}
-          className="hidden lg:flex items-center gap-1 absolute left-6 top-20 z-30 pointer-events-auto cursor-pointer select-none"
-        >
-          <span className="px-3.5 py-1 rounded-full bg-[#4DB6AC] text-[#0A2220] text-xs font-semibold shadow-md transition-transform duration-200 hover:scale-105">
+      <div className="w-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 xl:px-20 relative flex-1 flex flex-col justify-between md:block">
+        {/* Left Floating Cursor Badge */}
+        <div className="hidden lg:flex items-center gap-1 absolute left-6 top-20 pointer-events-none select-none">
+          <span className="px-3.5 py-1 rounded-full bg-[#4DB6AC] text-[#0A2220] text-xs font-semibold shadow-sm">
             Premiere Pro
           </span>
-          <svg
-            ref={leftCursorRef}
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            className="-mt-4 -ml-1 text-[#4DB6AC] pointer-events-none will-change-transform"
-          >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="-mt-4 -ml-1 text-[#4DB6AC]">
             <path d="M2 2L14 7L8 9L6 14L2 2Z" fill="currentColor" />
           </svg>
         </div>
 
-        {/* Right Floating Chip + Roaming Mouse Pointer Symbol */}
-        <div
-          onMouseEnter={() => {
-            mayaHoveredRef.current = true;
-          }}
-          onMouseLeave={() => {
-            mayaHoveredRef.current = false;
-          }}
-          className="hidden lg:flex items-center gap-1 absolute right-6 top-36 z-30 pointer-events-auto cursor-pointer select-none"
-        >
-          <svg
-            ref={rightCursorRef}
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            className="-mt-4 -mr-1 text-[#F08080] pointer-events-none will-change-transform"
-          >
+        {/* Right Floating Cursor Badge */}
+        <div className="hidden lg:flex items-center gap-1 absolute right-6 top-36 pointer-events-none select-none">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="-mt-4 -mr-1 text-[#F08080]">
             <path d="M14 2L2 7L8 9L10 14L14 2Z" fill="currentColor" />
           </svg>
-          <span className="px-3.5 py-1 rounded-full bg-[#F08080] text-[#2A0B0B] text-xs font-semibold shadow-md transition-transform duration-200 hover:scale-105">
+          <span className="px-3.5 py-1 rounded-full bg-[#F08080] text-[#2A0B0B] text-xs font-semibold shadow-sm">
             Maya &amp; VFX
           </span>
         </div>
