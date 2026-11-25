@@ -35,7 +35,7 @@ export const HangingIdCard: React.FC = () => {
     let rafId = 0;
     const anchorX = 160;
     const anchorY = 0;
-    const restClipY = 176;
+    const restClipY = 152;
 
     const step = () => {
       const p = phys.current;
@@ -144,38 +144,38 @@ export const HangingIdCard: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full max-w-[320px] h-[470px] mx-auto select-none flex flex-col items-center">
-      {/* Printed Lanyard Strap from Top Edge */}
+    <div className="relative w-full max-w-[320px] h-[445px] mx-auto select-none flex flex-col items-center">
+      {/* Printed Lanyard Strap from Very Top Edge */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none overflow-visible"
-        viewBox="0 0 320 470"
+        viewBox="0 0 320 445"
         fill="none"
         aria-hidden="true"
       >
         <defs>
-          <linearGradient id="slateRibbon" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#4F7084" />
-            <stop offset="50%" stopColor="#6B8FA4" />
-            <stop offset="100%" stopColor="#456375" />
+          <linearGradient id="slateRibbon" gradientUnits="userSpaceOnUse" x1="149" y1="0" x2="171" y2="0">
+            <stop offset="0%" stopColor="#4B6C80" />
+            <stop offset="50%" stopColor="#6D91A6" />
+            <stop offset="100%" stopColor="#466578" />
           </linearGradient>
         </defs>
         <path
           id="lanyardSpine"
           ref={ribbonRef}
-          d="M 160 0 Q 160 88 160 176"
+          d="M 160 0 Q 160 76 160 152"
           stroke="url(#slateRibbon)"
-          strokeWidth="20"
+          strokeWidth="22"
           strokeLinecap="butt"
         />
         <text
-          fill="#0F172A"
+          fill="#0B1117"
           fontSize="7.5"
-          fontWeight="700"
-          letterSpacing="1.6"
+          fontWeight="800"
+          letterSpacing="1.8"
           dominantBaseline="central"
         >
-          <textPath ref={ribbonTextPathRef} href="#lanyardSpine" startOffset="14%">
-            SUJAN KUMAR • SUJAN KUMAR •
+          <textPath ref={ribbonTextPathRef} href="#lanyardSpine" startOffset="6%">
+            SUJAN KUMAR • SUJAN KUMAR • SUJAN
           </textPath>
         </text>
       </svg>
@@ -186,7 +186,7 @@ export const HangingIdCard: React.FC = () => {
         onPointerDown={handlePointerDown}
         onMouseEnter={handleMouseEnter}
         style={{ transformOrigin: 'top center', transformStyle: 'preserve-3d' }}
-        className={`relative mt-[162px] w-[212px] sm:w-[224px] touch-none will-change-transform ${
+        className={`relative mt-[138px] w-[212px] sm:w-[224px] touch-none will-change-transform ${
           isDragging ? 'cursor-grabbing' : 'cursor-grab'
         }`}
       >

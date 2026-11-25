@@ -107,27 +107,27 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenResume }) 
           </div>
         </div>
 
-        {/* Centerpiece: Giant "Let's talk." Split Behind Centered Hanging ID Card */}
-        <div className="relative -mt-10 sm:-mt-20 flex flex-col items-center justify-center">
+        {/* Centerpiece: Giant "Let's talk." Split Around Centered Hanging ID Card */}
+        <div className="relative -mt-[118px] sm:-mt-[132px] flex flex-col items-center justify-center pointer-events-none">
           <div
             aria-hidden="true"
-            className="w-full flex items-center justify-center gap-[110px] sm:gap-[180px] lg:gap-[230px] pointer-events-none select-none absolute top-[195px] sm:top-[175px] left-1/2 -translate-x-1/2 z-0"
+            className="w-full flex items-center justify-center gap-[185px] sm:gap-[245px] lg:gap-[280px] select-none absolute top-[210px] sm:top-[195px] left-1/2 -translate-x-1/2 z-0"
           >
-            <span className="text-[3.4rem] sm:text-[6.5rem] lg:text-[9.5rem] font-extrabold tracking-tight text-white leading-none whitespace-nowrap">
+            <span className="text-[3.1rem] sm:text-[6.2rem] lg:text-[9rem] font-extrabold tracking-tight text-white leading-none whitespace-nowrap">
               Let&apos;s
             </span>
-            <span className="text-[3.4rem] sm:text-[6.5rem] lg:text-[9.5rem] font-extrabold tracking-tight text-white leading-none whitespace-nowrap">
+            <span className="text-[3.1rem] sm:text-[6.2rem] lg:text-[9rem] font-extrabold tracking-tight text-white leading-none whitespace-nowrap">
               talk.
             </span>
           </div>
 
-          <div className="relative z-10 w-full flex justify-center">
+          <div className="relative z-10 w-full flex justify-center pointer-events-auto">
             <HangingIdCard />
           </div>
         </div>
 
         {/* Bottom Row: Get In Touch Left & Quick Actions Right */}
-        <div className="mt-6 sm:mt-8 pt-6 border-t border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
+        <div className="mt-10 sm:mt-12 pt-6 border-t border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-widest text-[#8E8E93] mb-1.5">
               Get In Touch
