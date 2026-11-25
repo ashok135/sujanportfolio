@@ -55,11 +55,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenResume }) 
   return (
     <section
       id="contact"
-      className="relative pt-10 pb-14 sm:pt-12 sm:pb-20 border-t border-white/[0.08] bg-[#111111] overflow-x-clip"
+      className="relative pt-0 pb-14 sm:pb-20 border-t border-white/[0.08] bg-[#111111] overflow-x-clip"
     >
       <div className="w-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 xl:px-20">
         {/* Top Bar: Menu Left & Social Icon Buttons Right */}
-        <div className="flex items-start justify-between gap-6">
+        <div className="relative z-20 pt-10 sm:pt-12 flex items-start justify-between gap-6">
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-widest text-[#8E8E93] mb-2.5">
               Menu
@@ -107,18 +107,22 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenResume }) 
           </div>
         </div>
 
-        {/* Centerpiece: Giant "Let's talk." Split Around Centered Hanging ID Card */}
-        <div className="relative -mt-[118px] sm:-mt-[132px] flex flex-col items-center justify-center pointer-events-none">
+        {/* Centerpiece: Symmetric 50/50 "Let's" | Badge | "talk." Flush from Top Edge */}
+        <div className="relative -mt-[138px] sm:-mt-[146px] flex flex-col items-center justify-center pointer-events-none">
           <div
             aria-hidden="true"
-            className="w-full flex items-center justify-center gap-[185px] sm:gap-[245px] lg:gap-[280px] select-none absolute top-[210px] sm:top-[195px] left-1/2 -translate-x-1/2 z-0"
+            className="w-full flex items-center select-none absolute top-[230px] sm:top-[215px] left-0 z-0"
           >
-            <span className="text-[3.1rem] sm:text-[6.2rem] lg:text-[9rem] font-extrabold tracking-tight text-white leading-none whitespace-nowrap">
-              Let&apos;s
-            </span>
-            <span className="text-[3.1rem] sm:text-[6.2rem] lg:text-[9rem] font-extrabold tracking-tight text-white leading-none whitespace-nowrap">
-              talk.
-            </span>
+            <div className="w-1/2 flex justify-end pr-[118px] sm:pr-[140px] lg:pr-[155px]">
+              <span className="text-[3rem] sm:text-[6.2rem] lg:text-[9rem] font-extrabold tracking-tight text-white leading-none whitespace-nowrap">
+                Let&apos;s
+              </span>
+            </div>
+            <div className="w-1/2 flex justify-start pl-[118px] sm:pl-[140px] lg:pl-[155px]">
+              <span className="text-[3rem] sm:text-[6.2rem] lg:text-[9rem] font-extrabold tracking-tight text-white leading-none whitespace-nowrap">
+                talk.
+              </span>
+            </div>
           </div>
 
           <div className="relative z-10 w-full flex justify-center pointer-events-auto">
