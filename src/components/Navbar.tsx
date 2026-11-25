@@ -71,7 +71,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onOpenResume }) =
       }}
       className="fixed top-0 left-0 right-0 z-40 bg-[#111111]/80 backdrop-blur-md will-change-transform"
     >
-      <div className="w-full px-5 sm:px-8 lg:px-14 xl:px-20 h-20 flex items-center justify-between gap-4">
+      <div className="w-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 xl:px-20 h-20 flex items-center justify-between gap-4">
         {/* Left: Asterisk Brand Mark */}
         <a
           href="#hero"

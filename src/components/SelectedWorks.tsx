@@ -146,7 +146,7 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({ onPlayVideo }) => 
             )}
 
             {/* Top Gallery Chips */}
-            <div className="relative z-10 w-full px-5 sm:px-8 lg:px-14 xl:px-20">
+            <div className="relative z-10 w-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 xl:px-20">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5" role="group" aria-label="Work galleries">
                 <button
                   type="button"
@@ -188,7 +188,7 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({ onPlayVideo }) => 
             </div>
 
             {/* Main Split: Left Active Spotlight + Right Horizontal Portrait Card Strip */}
-            <div className="relative z-10 w-full pl-5 sm:pl-8 lg:pl-14 xl:pl-20 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto">
+            <div className="relative z-10 w-full max-w-[1440px] mx-auto pl-5 sm:pl-8 lg:pl-14 xl:pl-20 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto">
               {activeProject && (
                 <div className="lg:col-span-5 pr-5 sm:pr-8 lg:pr-4 space-y-3.5 sm:space-y-4">
                   <div className="space-y-1.5">
@@ -296,7 +296,7 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({ onPlayVideo }) => 
             </div>
 
             {/* Bottom Controls Bar */}
-            <div className="relative z-10 w-full px-5 sm:px-8 lg:px-14 xl:px-20 flex items-center justify-between gap-6">
+            <div className="relative z-10 w-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 xl:px-20 flex items-center justify-between gap-6">
               <div className="flex items-center gap-3 flex-1 max-w-xl">
                 <button
                   type="button"

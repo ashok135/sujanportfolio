@@ -6,7 +6,7 @@ export const ExperienceTimeline: React.FC = () => {
 
   return (
     <section id="experience" className="py-16 sm:py-24 border-t border-white/[0.08] bg-[#141416]">
-      <div className="w-full px-5 sm:px-8 lg:px-14 xl:px-20">
+      <div className="w-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 xl:px-20">
         <div className="mb-10">
           <h2 className="text-2xl sm:text-4xl font-semibold text-white">
             Work Experience

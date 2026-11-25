@@ -244,7 +244,7 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
     >
       <div
         ref={heroInnerRef}
-        className="w-full px-5 sm:px-8 lg:px-14 xl:px-20 relative flex-1 flex flex-col justify-between md:block"
+        className="w-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 xl:px-20 relative flex-1 flex flex-col justify-between md:block"
       >
         {/* Left Floating Chip + Roaming Mouse Pointer Symbol */}
         <div

@@ -231,7 +231,7 @@ export const SkillsMatrix: React.FC = () => {
       id="skills"
       className="py-20 sm:py-32 border-t border-white/[0.08] bg-[#111111] overflow-hidden"
     >
-      <div className="w-full px-5 sm:px-8 lg:px-14 xl:px-20">
+      <div className="w-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 xl:px-20">
         <div className="mb-16 sm:mb-24">
           <span className="text-xs font-medium uppercase tracking-widest text-[#FACC15]">
             Skills &amp; Software
