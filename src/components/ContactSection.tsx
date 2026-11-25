@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowUpRight, FileDown, Mail, Phone } from 'lucide-react';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
+import { HangingIdCard } from './HangingIdCard';
 
 interface ContactSectionProps {
   onOpenResume: () => void;
@@ -10,42 +11,42 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenResume }) 
   const { personal } = PORTFOLIO_DATA;
 
   return (
-    <section id="contact" className="py-16 sm:py-24 border-t border-white/[0.08] bg-[#111111]">
+    <section id="contact" className="pt-0 pb-16 sm:pb-24 border-t border-white/[0.08] bg-[#111111] overflow-x-clip">
       <div className="w-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 xl:px-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          <div className="lg:col-span-7 space-y-5">
-            <h2 className="text-2xl sm:text-4xl font-semibold text-white leading-[1.15]">
-              Let&apos;s work on your next film, trailer, or campaign.
-            </h2>
-            <p className="text-sm sm:text-base text-[#8E8E93] max-w-lg leading-relaxed">
-              Based in {personal.location}. Open to studio roles, freelance editing contracts, trailers, and AI-assisted visual production.
-            </p>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+          <div className="lg:col-span-7 pt-16 sm:pt-24 space-y-6">
+            <div className="space-y-4">
+              <h2 className="text-2xl sm:text-4xl font-semibold text-white leading-[1.15]">
+                Let&apos;s work on your next film, trailer, or campaign.
+              </h2>
+              <p className="text-sm sm:text-base text-[#8E8E93] max-w-lg leading-relaxed">
+                Based in {personal.location}. Open to studio roles, freelance editing contracts, trailers, and AI-assisted visual production.
+              </p>
 
-            <div className="pt-1 flex flex-col sm:flex-row gap-3">
-              <a
-                href={personal.whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="min-h-[46px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-[#E4E4E7] text-[#111111] font-semibold text-sm transition-colors"
-              >
-                <span>Message on WhatsApp</span>
-                <span className="w-5 h-5 rounded-full bg-[#FACC15] flex items-center justify-center text-[#111111]">
-                  <ArrowUpRight size={13} strokeWidth={2} />
-                </span>
-              </a>
+              <div className="pt-1 flex flex-col sm:flex-row gap-3">
+                <a
+                  href={personal.whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="min-h-[46px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-[#E4E4E7] text-[#111111] font-semibold text-sm transition-colors"
+                >
+                  <span>Message on WhatsApp</span>
+                  <span className="w-5 h-5 rounded-full bg-[#FACC15] flex items-center justify-center text-[#111111]">
+                    <ArrowUpRight size={13} strokeWidth={2} />
+                  </span>
+                </a>
 
-              <button
-                onClick={onOpenResume}
-                className="min-h-[46px] inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-white/[0.15] bg-[#18181B] hover:border-white/35 text-white font-medium text-sm transition-colors"
-              >
-                <FileDown size={15} strokeWidth={1.75} />
-                <span>Download Resume / CV</span>
-              </button>
+                <button
+                  onClick={onOpenResume}
+                  className="min-h-[46px] inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-white/[0.15] bg-[#18181B] hover:border-white/35 text-white font-medium text-sm transition-colors"
+                >
+                  <FileDown size={15} strokeWidth={1.75} />
+                  <span>Download Resume / CV</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="lg:col-span-5">
-            <div className="bg-[#18181B] border border-white/[0.08] rounded-2xl divide-y divide-white/[0.08]">
+            <div className="bg-[#18181B] border border-white/[0.08] rounded-2xl divide-y divide-white/[0.08] max-w-xl">
               <a
                 href={`mailto:${personal.email}`}
                 className="p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-white/[0.03] transition-colors group min-h-[60px]"
@@ -97,6 +98,10 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenResume }) 
                 <ArrowUpRight size={15} className="text-[#8E8E93] group-hover:text-white shrink-0" />
               </a>
             </div>
+          </div>
+
+          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+            <HangingIdCard />
           </div>
         </div>
       </div>
