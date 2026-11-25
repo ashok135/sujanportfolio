@@ -191,14 +191,7 @@ export const HangingIdCard: React.FC = () => {
           strokeWidth="22"
           strokeLinecap="butt"
         />
-        {/* Yellow centre stripe on lanyard */}
-        <path
-          d="M 160 0 Q 160 84 160 168"
-          stroke="#FACC15"
-          strokeWidth="3.5"
-          strokeOpacity="0.75"
-          strokeLinecap="butt"
-        />
+
         <text
           fill="#FACC15"
           fillOpacity="0.55"
