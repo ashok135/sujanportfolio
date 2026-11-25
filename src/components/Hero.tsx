@@ -180,8 +180,8 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
   }, [entered]);
 
   return (
-    <section id="hero" className="relative pt-24 pb-8 sm:pt-28 sm:pb-12 overflow-hidden">
-      <div className="w-full px-5 sm:px-8 lg:px-14 xl:px-20 relative">
+    <section id="hero" className="relative min-h-[100dvh] md:min-h-0 flex flex-col justify-between md:justify-start pt-20 pb-6 sm:pt-28 sm:pb-12 overflow-hidden">
+      <div className="w-full px-5 sm:px-8 lg:px-14 xl:px-20 relative flex-1 flex flex-col justify-between md:block">
         {/* Left Floating Cursor Badge */}
         <div className="hidden lg:flex items-center gap-1 absolute left-6 top-20 pointer-events-none select-none">
           <span className="px-3.5 py-1 rounded-full bg-[#4DB6AC] text-[#0A2220] text-xs font-semibold shadow-sm">
@@ -325,7 +325,7 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
         </div>
 
         {/* Mobile Curved Fanned 5-Card Deck (Matches Desktop Curve + Scroll Parting) */}
-        <div className="md:hidden mt-7 pt-5 pb-6 flex items-end justify-center">
+        <div className="md:hidden my-auto py-5 flex items-end justify-center">
           <div className="flex items-end justify-center -space-x-4 px-1">
             {DECK_CARDS.map((card, idx) => {
               const mobileRot = card.baseRotate * 0.8;
@@ -352,7 +352,7 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
                     transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
                     boxShadow: '0 14px 28px -8px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35)',
                   }}
-                  className={`relative w-[84px] h-36 rounded-2xl p-2 flex flex-col justify-between border border-white/25 will-change-transform ${card.bgClass}`}
+                  className={`relative w-[86px] h-44 rounded-2xl p-2.5 flex flex-col justify-between border border-white/25 will-change-transform ${card.bgClass}`}
                 >
                   <div>
                     <div className={`text-[9.5px] font-semibold leading-tight ${card.textClass}`}>
