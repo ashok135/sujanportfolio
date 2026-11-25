@@ -107,6 +107,7 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
   const { personal } = PORTFOLIO_DATA;
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [entered, setEntered] = useState(false);
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
   useEffect(() => {
     if (!ready) return;
@@ -228,6 +229,9 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
               const initialTransform = `translate3d(${card.entryX}px, ${card.entryY}px, 0) rotate(${card.entryRotate}deg) scale(0.85)`;
               const restingTransform = `translate3d(${card.baseX}px, ${card.baseY}px, 0) rotate(${card.baseRotate}deg) scale(${card.isCenter ? 1.05 : 1})`;
 
+              const isHovered = hoveredIdx === idx;
+              const showBadge = isHovered || (hoveredIdx === null && card.isCenter);
+
               return (
                 <div
                   key={card.id}
@@ -235,9 +239,8 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
                     cardRefs.current[idx] = el;
                   }}
                   style={{
-                    zIndex: card.zIndex,
+                    zIndex: isHovered ? 50 : card.zIndex,
                     transformOrigin: 'bottom center',
-                    boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.35)',
                     opacity: entered ? 1 : 0,
                     transform: entered ? restingTransform : initialTransform,
                     transitionProperty: 'transform, opacity',
@@ -245,6 +248,8 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
                     transitionDelay: `${idx * 65}ms`,
                     transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
                   }}
+                  onMouseEnter={() => setHoveredIdx(idx)}
+                  onMouseLeave={() => setHoveredIdx(null)}
                   onClick={() => onPlayReel(card.youtubeId, card.title)}
                   role="button"
                   tabIndex={0}
@@ -254,35 +259,46 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
                       onPlayReel(card.youtubeId, card.title);
                     }
                   }}
-                  className={`group relative w-44 lg:w-52 h-64 lg:h-72 rounded-[24px] p-4 flex flex-col justify-between cursor-pointer border border-white/20 hover:brightness-110 will-change-transform ${card.bgClass}`}
+                  className="group relative w-44 lg:w-52 h-64 lg:h-72 cursor-pointer will-change-transform"
                 >
-                  <div className="pt-1">
-                    <div className={`text-base lg:text-lg font-semibold leading-tight ${card.textClass}`}>
-                      {card.title}
+                  <div
+                    style={{
+                      boxShadow: isHovered
+                        ? '0 32px 64px -12px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.45)'
+                        : '0 24px 48px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.35)',
+                    }}
+                    className={`w-full h-full rounded-[24px] p-4 flex flex-col justify-between border border-white/20 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                      isHovered ? '-translate-y-7 scale-[1.07] brightness-110' : ''
+                    } ${card.bgClass}`}
+                  >
+                    <div className="pt-1">
+                      <div className={`text-base lg:text-lg font-semibold leading-tight ${card.textClass}`}>
+                        {card.title}
+                      </div>
+                      <div className={`text-[11px] opacity-85 mt-0.5 ${card.textClass}`}>
+                        {card.subtitle}
+                      </div>
                     </div>
-                    <div className={`text-[11px] opacity-85 mt-0.5 ${card.textClass}`}>
-                      {card.subtitle}
-                    </div>
-                  </div>
 
-                  {card.isCenter && (
-                    <div className="absolute -top-4 right-3 z-40 inline-flex items-center gap-2 bg-white text-[#111111] pl-3.5 pr-1.5 py-1.5 rounded-full shadow-xl text-xs font-semibold group-hover:scale-105 transition-transform">
-                      <span>Watch Reel</span>
-                      <span className="w-6 h-6 rounded-full bg-[#FACC15] flex items-center justify-center text-[#111111]">
-                        <ArrowUpRight size={13} strokeWidth={2.2} />
-                      </span>
-                    </div>
-                  )}
+                    {showBadge && (
+                      <div className="absolute -top-4 right-3 z-40 inline-flex items-center gap-2 bg-white text-[#111111] pl-3.5 pr-1.5 py-1.5 rounded-full shadow-xl text-xs font-semibold transition-transform duration-200 scale-100">
+                        <span>Watch Reel</span>
+                        <span className="w-6 h-6 rounded-full bg-[#FACC15] flex items-center justify-center text-[#111111]">
+                          <ArrowUpRight size={13} strokeWidth={2.2} />
+                        </span>
+                      </div>
+                    )}
 
-                  <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black/30 border border-white/25 shadow-inner mt-auto">
-                    <img
-                      src={`https://img.youtube.com/vi/${card.youtubeId}/mqdefault.jpg`}
-                      alt={card.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-black/15 flex items-center justify-center">
-                      <div className="w-9 h-9 rounded-full bg-white/95 text-[#111111] shadow-md flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Play size={14} className="fill-[#111111] translate-x-0.5" />
+                    <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black/30 border border-white/25 shadow-inner mt-auto">
+                      <img
+                        src={`https://img.youtube.com/vi/${card.youtubeId}/mqdefault.jpg`}
+                        alt={card.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-black/15 flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-full bg-white/95 text-[#111111] shadow-md flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Play size={14} className="fill-[#111111] translate-x-0.5" />
+                        </div>
                       </div>
                     </div>
                   </div>
