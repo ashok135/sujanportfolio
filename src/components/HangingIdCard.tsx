@@ -2,102 +2,121 @@ import React, { useEffect, useRef, useState } from 'react';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
 
 /**
- * Minimal, photo-first hanging Crew ID Pass with proper elastic spring-pendulum physics.
+ * BadgeFolio-inspired 3D interactive hanging ID card with elastic lanyard physics.
+ * Features 3D perspective tilt (rotateX/Y/Z), throwable spring-pendulum physics,
+ * dynamic specular sheen, and a minimal photo-first layout.
  */
 export const HangingIdCard: React.FC = () => {
   const { personal } = PORTFOLIO_DATA;
   const cardRef = useRef<HTMLDivElement>(null);
-  const strapOuterRef = useRef<SVGPathElement>(null);
-  const strapInnerRef = useRef<SVGPathElement>(null);
+  const ribbonRef = useRef<SVGPathElement>(null);
+  const ribbonHighlightRef = useRef<SVGPathElement>(null);
+  const sheenRef = useRef<HTMLDivElement>(null);
 
   const [isDragging, setIsDragging] = useState(false);
 
-  const stateRef = useRef({
+  const phys = useRef({
     x: 0,
     y: 0,
     vx: 0,
     vy: 0,
-    rot: 0,
+    rotZ: 0,
+    vRotZ: 0,
+    rotX: 0,
+    rotY: 0,
     dragging: false,
-    startPointerX: 0,
-    startPointerY: 0,
-    startCardX: 0,
-    startCardY: 0,
-    idleTime: 0,
+    startPX: 0,
+    startPY: 0,
+    startX: 0,
+    startY: 0,
+    t: 0,
   });
 
   useEffect(() => {
     let rafId = 0;
-
-    // SVG coordinate space: 320 x 410; card top-center sits at (160, 82)
-    const anchorX = 160;
+    const anchorX = 170;
     const anchorY = 0;
-    const restClipY = 82;
+    const restClipY = 92;
 
-    const tick = () => {
-      const s = stateRef.current;
-      s.idleTime += 0.025;
+    const step = () => {
+      const p = phys.current;
+      p.t += 0.022;
 
-      if (!s.dragging) {
-        // Snappy elastic spring-damper physics
-        const stiffness = 0.13;
-        const damping = 0.86;
-        s.vx = (s.vx + -s.x * stiffness) * damping;
-        s.vy = (s.vy + -s.y * stiffness) * damping;
-        s.x += s.vx;
-        s.y += s.vy;
+      if (!p.dragging) {
+        // Elastic spring return for X/Y translation
+        const k = 0.11;
+        const damp = 0.87;
+        p.vx = (p.vx - p.x * k) * damp;
+        p.vy = (p.vy - p.y * k) * damp;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Pendulum angular spring coupled to horizontal acceleration
+        const targetZ = Math.max(-34, Math.min(34, p.x * 0.16 + p.vx * 0.7 + Math.sin(p.t) * 1.1));
+        p.vRotZ = (p.vRotZ + (targetZ - p.rotZ) * 0.14) * 0.84;
+        p.rotZ += p.vRotZ;
+      } else {
+        const targetZ = Math.max(-36, Math.min(36, p.x * 0.18 + p.vx * 0.65));
+        p.rotZ += (targetZ - p.rotZ) * 0.25;
       }
 
-      // Natural pendulum tilt + subtle breathing sway when idle
-      const idleSway = !s.dragging && Math.abs(s.x) < 0.8 && Math.abs(s.vx) < 0.2
-        ? Math.sin(s.idleTime) * 1.4
-        : 0;
-      const targetRot = Math.max(-32, Math.min(32, s.x * 0.18 + s.vx * 0.55 + idleSway));
-      s.rot += (targetRot - s.rot) * 0.26;
+      // 3D perspective tilt based on drag offset and velocity
+      const targetRotY = Math.max(-24, Math.min(24, p.x * 0.16 + p.vx * 0.5));
+      const targetRotX = Math.max(-18, Math.min(18, -p.y * 0.12 - p.vy * 0.35));
+      p.rotY += (targetRotY - p.rotY) * 0.2;
+      p.rotX += (targetRotX - p.rotX) * 0.2;
 
       if (cardRef.current) {
-        cardRef.current.style.transform = `translate3d(${s.x.toFixed(2)}px, ${s.y.toFixed(2)}px, 0) rotate(${s.rot.toFixed(2)}deg)`;
+        cardRef.current.style.transform = `perspective(950px) translate3d(${p.x.toFixed(2)}px, ${p.y.toFixed(2)}px, 0) rotateX(${p.rotX.toFixed(2)}deg) rotateY(${p.rotY.toFixed(2)}deg) rotateZ(${p.rotZ.toFixed(2)}deg)`;
       }
 
-      // Keep lanyard connected right to the metal clip center
-      const endX = anchorX + s.x;
-      const endY = Math.max(18, restClipY + s.y);
-      const ctrlX = anchorX + s.x * 0.38;
-      const ctrlY = endY * 0.54;
-      const d = `M ${anchorX} ${anchorY} Q ${ctrlX.toFixed(1)} ${ctrlY.toFixed(1)} ${endX.toFixed(1)} ${endY.toFixed(1)}`;
+      if (sheenRef.current) {
+        const gx = 50 + p.rotY * 1.8;
+        const gy = 30 - p.rotX * 1.8;
+        sheenRef.current.style.background = `radial-gradient(circle at ${gx.toFixed(1)}% ${gy.toFixed(1)}%, rgba(255,255,255,0.18) 0%, rgba(250,204,21,0.06) 30%, transparent 68%)`;
+      }
 
-      if (strapOuterRef.current) strapOuterRef.current.setAttribute('d', d);
-      if (strapInnerRef.current) strapInnerRef.current.setAttribute('d', d);
+      // Attach ribbon seamlessly to the top clip center
+      const endX = anchorX + p.x;
+      const endY = Math.max(20, restClipY + p.y);
+      const ctrlX = anchorX + p.x * 0.32;
+      const ctrlY = endY * 0.55;
+      const pathD = `M ${anchorX} ${anchorY} Q ${ctrlX.toFixed(1)} ${ctrlY.toFixed(1)} ${endX.toFixed(1)} ${endY.toFixed(1)}`;
 
-      rafId = requestAnimationFrame(tick);
+      if (ribbonRef.current) ribbonRef.current.setAttribute('d', pathD);
+      if (ribbonHighlightRef.current) ribbonHighlightRef.current.setAttribute('d', pathD);
+
+      rafId = requestAnimationFrame(step);
     };
 
-    rafId = requestAnimationFrame(tick);
+    rafId = requestAnimationFrame(step);
     return () => cancelAnimationFrame(rafId);
   }, []);
 
   useEffect(() => {
     const onPointerMove = (e: PointerEvent) => {
-      const s = stateRef.current;
-      if (!s.dragging) return;
+      const p = phys.current;
+      if (!p.dragging) return;
 
-      const dx = e.clientX - s.startPointerX;
-      const dy = e.clientY - s.startPointerY;
+      const dx = e.clientX - p.startPX;
+      const dy = e.clientY - p.startPY;
 
-      // Soft elastic resistance when pulling far
-      const nextX = Math.max(-140, Math.min(140, s.startCardX + dx));
-      const nextY = Math.max(-45, Math.min(130, s.startCardY + dy));
+      // Rubber-band resistance when pulled far
+      const rawX = p.startX + dx;
+      const rawY = p.startY + dy;
+      const nextX = Math.max(-150, Math.min(150, rawX * 0.92));
+      const nextY = Math.max(-45, Math.min(135, rawY * 0.9));
 
-      s.vx = (nextX - s.x) * 0.4;
-      s.vy = (nextY - s.y) * 0.4;
-      s.x = nextX;
-      s.y = nextY;
+      p.vx = (nextX - p.x) * 0.55;
+      p.vy = (nextY - p.y) * 0.55;
+      p.x = nextX;
+      p.y = nextY;
     };
 
     const onPointerUp = () => {
-      const s = stateRef.current;
-      if (!s.dragging) return;
-      s.dragging = false;
+      const p = phys.current;
+      if (!p.dragging) return;
+      p.dragging = false;
       setIsDragging(false);
     };
 
@@ -114,95 +133,109 @@ export const HangingIdCard: React.FC = () => {
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.preventDefault();
-    const s = stateRef.current;
-    s.dragging = true;
-    s.startPointerX = e.clientX;
-    s.startPointerY = e.clientY;
-    s.startCardX = s.x;
-    s.startCardY = s.y;
+    const p = phys.current;
+    p.dragging = true;
+    p.startPX = e.clientX;
+    p.startPY = e.clientY;
+    p.startX = p.x;
+    p.startY = p.y;
     setIsDragging(true);
   };
 
   const handleMouseEnter = () => {
-    const s = stateRef.current;
-    if (s.dragging) return;
-    if (Math.abs(s.vx) < 2) {
-      s.vx += s.x >= 0 ? -5.5 : 5.5;
-      s.vy += 2.5;
+    const p = phys.current;
+    if (p.dragging) return;
+    if (Math.abs(p.vx) < 2) {
+      p.vx += p.x >= 0 ? -5.2 : 5.2;
+      p.vy += 2.2;
     }
   };
 
   return (
-    <div className="relative w-full max-w-[320px] h-[410px] mx-auto select-none flex flex-col items-center">
-      {/* Top Anchor Pin */}
-      <div className="w-8 h-1.5 rounded-full bg-white/20 z-10" />
+    <div className="relative w-full max-w-[340px] h-[430px] mx-auto select-none flex flex-col items-center">
+      {/* Top Anchor Grommet */}
+      <div className="w-10 h-1.5 rounded-full bg-white/20 z-10" />
 
-      {/* Elastic Lanyard Cord */}
+      {/* Printed Fabric Lanyard Ribbon */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none overflow-visible"
-        viewBox="0 0 320 410"
+        viewBox="0 0 340 430"
         fill="none"
         aria-hidden="true"
       >
+        <defs>
+          <linearGradient id="lanyardGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#1C1C21" />
+            <stop offset="50%" stopColor="#2E2E36" />
+            <stop offset="100%" stopColor="#18181B" />
+          </linearGradient>
+        </defs>
         <path
-          ref={strapOuterRef}
-          d="M 160 0 Q 160 44 160 82"
-          stroke="#27272A"
-          strokeWidth="12"
+          ref={ribbonRef}
+          d="M 170 0 Q 170 50 170 92"
+          stroke="url(#lanyardGrad)"
+          strokeWidth="22"
           strokeLinecap="round"
         />
         <path
-          ref={strapInnerRef}
-          d="M 160 0 Q 160 44 160 82"
+          ref={ribbonHighlightRef}
+          d="M 170 0 Q 170 50 170 92"
           stroke="#FACC15"
-          strokeOpacity="0.6"
+          strokeOpacity="0.45"
           strokeWidth="2"
           strokeLinecap="round"
         />
       </svg>
 
-      {/* Draggable Minimal ID Card */}
+      {/* 3D Draggable ID Card */}
       <div
         ref={cardRef}
         onPointerDown={handlePointerDown}
         onMouseEnter={handleMouseEnter}
-        style={{ transformOrigin: 'top center' }}
-        className={`relative mt-[72px] w-[228px] touch-none will-change-transform ${
+        style={{ transformOrigin: 'top center', transformStyle: 'preserve-3d' }}
+        className={`relative mt-[78px] w-[236px] touch-none will-change-transform ${
           isDragging ? 'cursor-grabbing' : 'cursor-grab'
         }`}
       >
-        {/* Metal Lanyard Clip */}
-        <div className="mx-auto w-9 h-4 -mb-2 relative z-20 rounded-t-md bg-gradient-to-b from-zinc-200 to-zinc-500 border border-white/40 shadow flex items-center justify-center">
-          <div className="w-4 h-1 rounded-full bg-[#111111]" />
+        {/* Realistic Metal Swivel Clasp */}
+        <div className="mx-auto flex flex-col items-center -mb-2 relative z-20 pointer-events-none">
+          <div className="w-6 h-3 rounded-t-md bg-gradient-to-b from-zinc-200 to-zinc-500 border border-white/50 shadow" />
+          <div className="w-3.5 h-3.5 -mt-0.5 rounded-full border-[2.5px] border-zinc-300 bg-[#111111] shadow-sm" />
+          <div className="w-8 h-3 -mt-1 rounded-sm bg-gradient-to-b from-zinc-300 to-zinc-600 border border-white/40 shadow-md" />
         </div>
 
-        {/* Clean Card Body */}
-        <div className="rounded-[22px] bg-[#18181B] border border-white/15 p-3.5 pt-4 shadow-[0_26px_55px_-12px_rgba(0,0,0,0.85)]">
+        {/* Polycarbonate Badge Shell */}
+        <div className="relative rounded-[22px] bg-gradient-to-b from-[#1E1E22] to-[#131316] border border-white/20 p-3.5 pt-4 shadow-[0_30px_60px_-14px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.2)] overflow-hidden">
+          {/* Dynamic 3D Specular Sheen */}
+          <div ref={sheenRef} className="absolute inset-0 pointer-events-none z-10" />
+
           {/* Punched Slot */}
-          <div className="mx-auto w-10 h-1.5 rounded-full bg-[#09090B] border border-white/10 mb-3" />
+          <div className="mx-auto w-11 h-1.5 rounded-full bg-[#09090B] border border-white/15 mb-3" />
 
           {/* Sujan Photo */}
-          <div className="relative w-full aspect-[4/4.2] rounded-2xl overflow-hidden bg-[#111111] border border-white/10">
+          <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-[#0E0E10] border border-white/10">
             <img
               src="/images/sujan-profile.jpg"
               alt={personal.name}
               draggable={false}
               className="w-full h-full object-cover object-top pointer-events-none"
             />
-            <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/65 backdrop-blur-md text-[10px] font-medium text-emerald-400 border border-white/10">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Available
-            </span>
           </div>
 
-          {/* Minimal Name & Role */}
-          <div className="pt-3 pb-1 text-center">
-            <div className="text-base font-semibold text-white leading-tight">
-              {personal.name}
+          {/* Minimal Footer */}
+          <div className="relative pt-3.5 pb-0.5 flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-[15px] font-semibold text-white leading-tight truncate">
+                {personal.name}
+              </div>
+              <div className="text-[11px] text-[#FACC15] font-medium mt-0.5 truncate">
+                Video Editor &amp; VFX
+              </div>
             </div>
-            <div className="text-[11px] text-[#FACC15] font-medium mt-0.5">
-              Video Editor • VFX &amp; CGI
-            </div>
+            <span
+              title="Available for work"
+              className="shrink-0 w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"
+            />
           </div>
         </div>
       </div>
