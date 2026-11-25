@@ -106,6 +106,7 @@ const DECK_CARDS = [
 export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = true }) => {
   const { personal } = PORTFOLIO_DATA;
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const mobileCardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [entered, setEntered] = useState(false);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
@@ -143,6 +144,21 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
         el.style.transform = `translate3d(${tx}px, ${ty}px, 0) rotate(${rot}deg) scale(${scale})`;
         el.style.opacity = String(opacity);
         el.style.pointerEvents = opacity <= 0.05 ? 'none' : 'auto';
+
+        const mel = mobileCardRefs.current[idx];
+        if (mel) {
+          if (window.scrollY > 4) {
+            mel.style.transitionDuration = '0ms';
+            mel.style.transitionDelay = '0ms';
+          }
+          const mtx = card.scrollX * 0.45 * progress;
+          const mty = card.baseY * 0.5 + card.scrollY * 0.45 * progress;
+          const mrot = card.baseRotate * 0.8 + card.scrollRotate * 0.7 * progress;
+          const mscale = (card.isCenter ? 1.08 : 0.95) - progress * 0.1;
+          mel.style.transform = `translate3d(${mtx}px, ${mty}px, 0) rotate(${mrot}deg) scale(${mscale})`;
+          mel.style.opacity = String(opacity);
+          mel.style.pointerEvents = opacity <= 0.05 ? 'none' : 'auto';
+        }
       });
     };
 
@@ -164,7 +180,7 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
   }, [entered]);
 
   return (
-    <section id="hero" className="relative min-h-[100dvh] md:min-h-0 flex flex-col justify-center md:justify-start pt-20 pb-8 sm:pt-28 sm:pb-12 overflow-hidden">
+    <section id="hero" className="relative pt-24 pb-8 sm:pt-28 sm:pb-12 overflow-hidden">
       <div className="w-full px-5 sm:px-8 lg:px-14 xl:px-20 relative">
         {/* Left Floating Cursor Badge */}
         <div className="hidden lg:flex items-center gap-1 absolute left-6 top-20 pointer-events-none select-none">
@@ -308,8 +324,8 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
           </div>
         </div>
 
-        {/* Mobile Curved Fanned 5-Card Deck (Matches Desktop Curve, Zero Text Clipping) */}
-        <div className="md:hidden mt-6 pt-4 pb-8 flex items-end justify-center overflow-hidden">
+        {/* Mobile Curved Fanned 5-Card Deck (Matches Desktop Curve + Scroll Parting) */}
+        <div className="md:hidden mt-7 pt-5 pb-6 flex items-end justify-center">
           <div className="flex items-end justify-center -space-x-4 px-1">
             {DECK_CARDS.map((card, idx) => {
               const mobileRot = card.baseRotate * 0.8;
@@ -317,6 +333,9 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
               return (
                 <div
                   key={card.id}
+                  ref={(el) => {
+                    mobileCardRefs.current[idx] = el;
+                  }}
                   onClick={() => onPlayReel(card.youtubeId, card.title)}
                   role="button"
                   tabIndex={0}
@@ -333,7 +352,7 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
                     transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
                     boxShadow: '0 14px 28px -8px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35)',
                   }}
-                  className={`relative w-[84px] h-36 rounded-2xl p-2 flex flex-col justify-between border border-white/25 ${card.bgClass}`}
+                  className={`relative w-[84px] h-36 rounded-2xl p-2 flex flex-col justify-between border border-white/25 will-change-transform ${card.bgClass}`}
                 >
                   <div>
                     <div className={`text-[9.5px] font-semibold leading-tight ${card.textClass}`}>
