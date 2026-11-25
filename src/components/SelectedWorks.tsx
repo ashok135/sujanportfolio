@@ -126,7 +126,7 @@ export const SelectedWorks: React.FC<SelectedWorksProps> = ({ onPlayVideo }) => 
           <div
             ref={spotlightRef}
             style={{ opacity: 0 }}
-            className="absolute inset-0 z-10 flex flex-col justify-between py-10 sm:py-14 will-change-transform"
+            className="absolute inset-0 z-10 flex flex-col justify-between pt-20 sm:pt-24 pb-8 sm:pb-12 will-change-transform"
           >
             {/* Dynamic Blurred Backdrop of Active Project */}
             {activeProject?.youtubeId && (
