@@ -1,195 +1,361 @@
-import React from 'react';
-import { Play, ArrowUpRight, Film, Clapperboard, PhoneCall } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowUpRight, Film, Play } from 'lucide-react';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
-import { Reveal } from './Reveal';
 
 interface HeroProps {
   onPlayReel: (youtubeId: string, title: string) => void;
   onOpenContact: () => void;
+  onOpenResume: () => void;
+  ready?: boolean;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenContact }) => {
+const DECK_CARDS = [
+  {
+    id: 'movie-trailer-cut',
+    youtubeId: 'HVY9huLHs9I',
+    title: 'Trailer Cut',
+    subtitle: 'Theatrical Pacing',
+    bgClass: 'bg-gradient-to-b from-[#917AE8] via-[#765ED4] to-[#5640AE]',
+    textClass: 'text-white',
+    entryX: -320,
+    entryY: 140,
+    entryRotate: -32,
+    baseRotate: -14,
+    baseY: 46,
+    baseX: 16,
+    scrollX: -480,
+    scrollY: 20,
+    scrollRotate: -20,
+    zIndex: 10,
+  },
+  {
+    id: 'color-grading-showcase',
+    youtubeId: 'GfAGpq4RkXk',
+    title: 'Color Grade',
+    subtitle: 'Lumetri & LUTs',
+    bgClass: 'bg-gradient-to-b from-[#F2A3A3] via-[#E48383] to-[#C96060]',
+    textClass: 'text-white',
+    entryX: -160,
+    entryY: -100,
+    entryRotate: -18,
+    baseRotate: -7,
+    baseY: 14,
+    baseX: 6,
+    scrollX: -280,
+    scrollY: 10,
+    scrollRotate: -12,
+    zIndex: 20,
+  },
+  {
+    id: 'gaming-demo-reel-2025',
+    youtubeId: 'MnftYQO8yHA',
+    title: '2025 Reel',
+    subtitle: 'Gaming & 3D CGI',
+    bgClass: 'bg-gradient-to-b from-[#14C4D8] via-[#0B9EB0] to-[#067482]',
+    textClass: 'text-white',
+    entryX: 0,
+    entryY: 180,
+    entryRotate: 0,
+    baseRotate: 0,
+    baseY: 0,
+    baseX: 0,
+    scrollX: 0,
+    scrollY: -35,
+    scrollRotate: 0,
+    zIndex: 30,
+    isCenter: true,
+  },
+  {
+    id: 'commercial-video-editing-reel',
+    youtubeId: 'WwTgk8z5F5Y',
+    title: 'Master Reel',
+    subtitle: 'Commercial Cuts',
+    bgClass: 'bg-gradient-to-b from-[#6AF498] via-[#41D873] to-[#24AE52]',
+    textClass: 'text-[#082612]',
+    entryX: 160,
+    entryY: -100,
+    entryRotate: 18,
+    baseRotate: 7,
+    baseY: 14,
+    baseX: -6,
+    scrollX: 280,
+    scrollY: 10,
+    scrollRotate: 12,
+    zIndex: 20,
+  },
+  {
+    id: 'housing-ad-commercial',
+    youtubeId: '6yaMnkZ7_GI',
+    title: 'Housing Ad',
+    subtitle: 'Real Estate Film',
+    bgClass: 'bg-gradient-to-b from-[#5B72EA] via-[#4157D0] to-[#293B9E]',
+    textClass: 'text-white',
+    entryX: 320,
+    entryY: 140,
+    entryRotate: 32,
+    baseRotate: 14,
+    baseY: 46,
+    baseX: -16,
+    scrollX: 480,
+    scrollY: 20,
+    scrollRotate: 20,
+    zIndex: 10,
+  },
+];
+
+export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = true }) => {
   const { personal } = PORTFOLIO_DATA;
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [entered, setEntered] = useState(false);
+
+  useEffect(() => {
+    if (!ready) return;
+    const timer = requestAnimationFrame(() => {
+      setEntered(true);
+    });
+    return () => cancelAnimationFrame(timer);
+  }, [ready]);
+
+  // Scroll-driven parting timed so cards clear right as Selected Works enters (zero blank gap)
+  useEffect(() => {
+    if (!entered) return;
+    let rafId = 0;
+
+    const updateScrollCards = () => {
+      const progress = Math.min(Math.max(window.scrollY / 420, 0), 1);
+
+      DECK_CARDS.forEach((card, idx) => {
+        const el = cardRefs.current[idx];
+        if (!el) return;
+
+        if (window.scrollY > 4) {
+          el.style.transitionDuration = '0ms';
+          el.style.transitionDelay = '0ms';
+        }
+
+        const tx = card.baseX + card.scrollX * progress;
+        const ty = card.baseY + card.scrollY * progress;
+        const rot = card.baseRotate + card.scrollRotate * progress;
+        const scale = card.isCenter ? 1.05 - progress * 0.12 : 1 - progress * 0.1;
+        const opacity = Math.max(1 - Math.max(progress - 0.15, 0) * 1.2, 0);
+
+        el.style.transform = `translate3d(${tx}px, ${ty}px, 0) rotate(${rot}deg) scale(${scale})`;
+        el.style.opacity = String(opacity);
+        el.style.pointerEvents = opacity <= 0.05 ? 'none' : 'auto';
+      });
+    };
+
+    const onScroll = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateScrollCards);
+    };
+
+    const settleTimer = setTimeout(() => {
+      if (window.scrollY > 4) updateScrollCards();
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }, 900);
+
+    return () => {
+      clearTimeout(settleTimer);
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(rafId);
+    };
+  }, [entered]);
 
   return (
-    <section id="hero" className="relative pt-20 pb-12 sm:pt-28 sm:pb-16 md:pt-36 md:pb-24 overflow-hidden bg-dot-pattern">
-      {/* Ambient background light gradients */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[600px] h-[250px] sm:h-[350px] bg-gradient-to-tr from-amber-200/40 via-indigo-100/40 to-emerald-100/30 blur-3xl -z-10 pointer-events-none rounded-full" />
+    <section id="hero" className="relative min-h-[100dvh] md:min-h-0 flex flex-col justify-center md:justify-start pt-20 pb-8 sm:pt-28 sm:pb-12 overflow-hidden">
+      <div className="w-full px-5 sm:px-8 lg:px-14 xl:px-20 relative">
+        {/* Left Floating Cursor Badge */}
+        <div className="hidden lg:flex items-center gap-1 absolute left-6 top-20 pointer-events-none select-none">
+          <span className="px-3.5 py-1 rounded-full bg-[#4DB6AC] text-[#0A2220] text-xs font-semibold shadow-sm">
+            Premiere Pro
+          </span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="-mt-4 -ml-1 text-[#4DB6AC]">
+            <path d="M2 2L14 7L8 9L6 14L2 2Z" fill="currentColor" />
+          </svg>
+        </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
-          {/* Left Column: Headline, Bio & CTAs (7 cols) */}
-          <div className="lg:col-span-7 space-y-4 sm:space-y-6 text-center lg:text-left">
-            <Reveal direction="up" delay={50}>
-              {/* Eyebrow Pill */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white border border-slate-200/80 shadow-xs text-[11px] sm:text-xs font-semibold text-slate-700">
-                <span className="flex h-2 w-2 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-                </span>
-                <span>Visual Storyteller • VFX Artist • AI Creator</span>
-                <span className="text-slate-300">•</span>
-                <span className="text-slate-500 font-medium">{personal.location}</span>
-              </div>
-            </Reveal>
+        {/* Right Floating Cursor Badge */}
+        <div className="hidden lg:flex items-center gap-1 absolute right-6 top-36 pointer-events-none select-none">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="-mt-4 -mr-1 text-[#F08080]">
+            <path d="M14 2L2 7L8 9L10 14L14 2Z" fill="currentColor" />
+          </svg>
+          <span className="px-3.5 py-1 rounded-full bg-[#F08080] text-[#2A0B0B] text-xs font-semibold shadow-sm">
+            Maya &amp; VFX
+          </span>
+        </div>
 
-            <Reveal direction="up" delay={150}>
-              {/* Main Fluid Heading */}
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.12] sm:leading-[1.08] font-display">
-                Bringing Cinema, <br className="hidden sm:inline" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-indigo-600 to-indigo-800">
-                  Bollywood VFX
-                </span>{' '}
-                & AI Motion to Life.
-              </h1>
-            </Reveal>
-
-            <Reveal direction="up" delay={250}>
-              {/* Sub-headline / Pitch */}
-              <p className="text-sm sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-normal">
-                I&apos;m <strong className="text-slate-900 font-semibold">{personal.name}</strong>, a Mid-Level Video Editor & CGI Animator with credits on Bollywood theatrical blockbusters (<em>Brahmāstra</em>, <em>Kalki 2898 AD</em>, <em>Fighter</em>), Disney Junior animation, and high-impact commercial advertising.
-              </p>
-            </Reveal>
-
-            <Reveal direction="up" delay={350}>
-              {/* Hero CTAs */}
-              <div className="pt-1 flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-4">
-                {/* Play Master Reel Button */}
-                <button
-                  onClick={() => onPlayReel('MnftYQO8yHA', 'Gaming 3D Demo Reel 2025')}
-                  className="group inline-flex items-center gap-2.5 sm:gap-3 px-5 py-3 sm:px-6 sm:py-3.5 rounded-full bg-slate-900 hover:bg-indigo-600 text-white font-semibold text-xs sm:text-sm transition-all duration-300 shadow-md hover:shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 flex items-center justify-center transition-transform group-hover:scale-110">
-                    <Play size={13} className="fill-white translate-x-0.5" />
-                  </div>
-                  <span>Watch 2025 Showreel</span>
-                </button>
-
-                {/* Contact Button */}
-                <button
-                  onClick={onOpenContact}
-                  className="group inline-flex items-center gap-2 px-4 py-3 sm:px-5 sm:py-3.5 rounded-full bg-white hover:bg-slate-50 text-slate-800 font-semibold text-xs sm:text-sm border border-slate-300/80 transition-all duration-200 shadow-xs hover:border-slate-400 active:scale-[0.98]"
-                >
-                  <span>Hire / Collaborate</span>
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-                    <ArrowUpRight size={12} />
-                  </div>
-                </button>
-
-                {/* Direct WhatsApp Pill */}
-                <a
-                  href={personal.whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs border border-emerald-200/80 transition-all"
-                  title="Direct WhatsApp Message"
-                >
-                  <PhoneCall size={13} className="text-emerald-600" />
-                  <span>+91 8147582669</span>
-                </a>
-              </div>
-            </Reveal>
-
-            <Reveal direction="up" delay={450}>
-              {/* Credibility Metric Chips */}
-              <div className="pt-4 sm:pt-6 border-t border-slate-200/70 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 text-left">
-                <div className="bg-white/80 p-2.5 sm:p-3 rounded-2xl border border-slate-200/60 shadow-xs hover:border-amber-300 transition-colors">
-                  <span className="block text-xl sm:text-2xl font-bold font-display text-slate-900">
-                    {personal.yearsExperience}
-                  </span>
-                  <span className="text-[11px] sm:text-xs text-slate-500 font-medium leading-tight block">Years in Production</span>
-                </div>
-
-                <div className="bg-white/80 p-2.5 sm:p-3 rounded-2xl border border-slate-200/60 shadow-xs hover:border-amber-300 transition-colors">
-                  <span className="block text-xl sm:text-2xl font-bold font-display text-amber-600">
-                    {personal.bollywoodCount}
-                  </span>
-                  <span className="text-[11px] sm:text-xs text-slate-500 font-medium leading-tight block">Bollywood Movies</span>
-                </div>
-
-                <div className="bg-white/80 p-2.5 sm:p-3 rounded-2xl border border-slate-200/60 shadow-xs hover:border-amber-300 transition-colors">
-                  <span className="block text-xl sm:text-2xl font-bold font-display text-indigo-600">
-                    {personal.globalShowsCount}
-                  </span>
-                  <span className="text-[11px] sm:text-xs text-slate-500 font-medium leading-tight block">Disney / Netflix CG</span>
-                </div>
-
-                <div className="bg-white/80 p-2.5 sm:p-3 rounded-2xl border border-slate-200/60 shadow-xs hover:border-amber-300 transition-colors">
-                  <span className="block text-xl sm:text-2xl font-bold font-display text-emerald-600">
-                    5
-                  </span>
-                  <span className="text-[11px] sm:text-xs text-slate-500 font-medium leading-tight block">Languages Fluent</span>
-                </div>
-              </div>
-            </Reveal>
+        {/* Centered Editorial Header */}
+        <div className="text-center max-w-3xl mx-auto space-y-3.5 sm:space-y-4">
+          <div className="inline-flex items-center gap-2 text-xs text-[#A1A1AA]">
+            <Film size={13} className="text-[#FACC15]" strokeWidth={1.75} />
+            <span>{personal.location}</span>
+            <span className="text-white/25">—</span>
+            <span>6+ Years in VFX &amp; Editing</span>
           </div>
 
-          {/* Right Column: Double-Bezel Hardware Frame with Sujan's Real Photo (5 cols) */}
-          <div className="lg:col-span-5 flex justify-center">
-            <Reveal direction="left" delay={200}>
-              <div className="relative w-full max-w-[270px] sm:max-w-md mx-auto">
-                {/* Outer Decorative Glow */}
-                <div className="absolute -inset-2 bg-gradient-to-tr from-amber-400/20 via-indigo-500/20 to-emerald-400/20 rounded-[2.5rem] blur-xl opacity-75 -z-10" />
+          <h1 className="text-3xl sm:text-5xl lg:text-[3.5rem] font-semibold text-white leading-[1.12] tracking-tight">
+            Sujan Kumar M.V <br />
+            <span className="font-editorial-italic text-[1.12em] pr-0.5">C</span>rafting Cinema &amp; VFX
+          </h1>
 
-                {/* Hardware Double-Bezel Card */}
-                <div className="bezel-outer shadow-xl">
-                  <div className="bezel-inner overflow-hidden relative bg-slate-900">
-                    {/* Photo Container */}
-                    <div className="relative aspect-[4/5] w-full overflow-hidden">
-                      <img
-                        src={personal.avatarUrl}
-                        alt="Sujan Kumar M.V — AI Animator & Video Editor"
-                        className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-700 ease-out"
-                      />
+          <p className="text-xs sm:text-sm text-[#A1A1AA] leading-relaxed max-w-xl mx-auto">
+            Video Editor, Graphic Designer &amp; CGI Animator with credits on Bollywood blockbusters (<em>Brahmāstra</em>, <em>Kalki 2898 AD</em>, <em>Fighter</em>), Disney Junior &amp; Netflix series, and commercial reels.
+          </p>
 
-                      {/* Gradient overlay for light vignette */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+          {/* Mobile Quick Actions */}
+          <div className="flex sm:hidden items-center justify-center gap-2.5 pt-1">
+            <button
+              onClick={() => onPlayReel('MnftYQO8yHA', 'Gaming 3D Demo Reel 2025')}
+              className="min-h-[42px] inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#FACC15] text-[#111111] text-xs font-semibold"
+            >
+              <Play size={13} className="fill-[#111111]" />
+              <span>Watch 2025 Reel</span>
+            </button>
+            <button
+              onClick={onOpenResume}
+              className="min-h-[42px] inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-white/15 bg-[#1A1A1D] text-white text-xs font-medium"
+            >
+              <span>Resume / CV</span>
+            </button>
+          </div>
+        </div>
 
-                      {/* Bottom Label Overlay */}
-                      <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 text-white">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-display font-bold text-base sm:text-lg text-white">
-                            Sujan Kumar M.V
-                          </span>
-                          <span className="px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[9px] sm:text-[10px] font-semibold tracking-wide uppercase">
-                            Bangalore
-                          </span>
-                        </div>
-                        <p className="text-[11px] sm:text-xs text-slate-300">
-                          Premiere Pro • After Effects • MAYA • Generative AI
-                        </p>
+        {/* Desktop Vibrant Colorful Curved 5-Card Deck (Compact Spacing) */}
+        <div className="hidden md:flex items-end justify-center mt-10 lg:mt-12 pt-4 pb-8">
+          <div className="flex items-end justify-center -space-x-5 lg:-space-x-3 max-w-5xl w-full">
+            {DECK_CARDS.map((card, idx) => {
+              const initialTransform = `translate3d(${card.entryX}px, ${card.entryY}px, 0) rotate(${card.entryRotate}deg) scale(0.85)`;
+              const restingTransform = `translate3d(${card.baseX}px, ${card.baseY}px, 0) rotate(${card.baseRotate}deg) scale(${card.isCenter ? 1.05 : 1})`;
+
+              return (
+                <div
+                  key={card.id}
+                  ref={(el) => {
+                    cardRefs.current[idx] = el;
+                  }}
+                  style={{
+                    zIndex: card.zIndex,
+                    transformOrigin: 'bottom center',
+                    boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.35)',
+                    opacity: entered ? 1 : 0,
+                    transform: entered ? restingTransform : initialTransform,
+                    transitionProperty: 'transform, opacity',
+                    transitionDuration: '850ms',
+                    transitionDelay: `${idx * 65}ms`,
+                    transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                  onClick={() => onPlayReel(card.youtubeId, card.title)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onPlayReel(card.youtubeId, card.title);
+                    }
+                  }}
+                  className={`group relative w-44 lg:w-52 h-64 lg:h-72 rounded-[24px] p-4 flex flex-col justify-between cursor-pointer border border-white/20 hover:brightness-110 will-change-transform ${card.bgClass}`}
+                >
+                  <div className="pt-1">
+                    <div className={`text-base lg:text-lg font-semibold leading-tight ${card.textClass}`}>
+                      {card.title}
+                    </div>
+                    <div className={`text-[11px] opacity-85 mt-0.5 ${card.textClass}`}>
+                      {card.subtitle}
+                    </div>
+                  </div>
+
+                  {card.isCenter && (
+                    <div className="absolute -top-4 right-3 z-40 inline-flex items-center gap-2 bg-white text-[#111111] pl-3.5 pr-1.5 py-1.5 rounded-full shadow-xl text-xs font-semibold group-hover:scale-105 transition-transform">
+                      <span>Watch Reel</span>
+                      <span className="w-6 h-6 rounded-full bg-[#FACC15] flex items-center justify-center text-[#111111]">
+                        <ArrowUpRight size={13} strokeWidth={2.2} />
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black/30 border border-white/25 shadow-inner mt-auto">
+                    <img
+                      src={`https://img.youtube.com/vi/${card.youtubeId}/mqdefault.jpg`}
+                      alt={card.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black/15 flex items-center justify-center">
+                      <div className="w-9 h-9 rounded-full bg-white/95 text-[#111111] shadow-md flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Play size={14} className="fill-[#111111] translate-x-0.5" />
                       </div>
                     </div>
                   </div>
                 </div>
+              );
+            })}
+          </div>
+        </div>
 
-                {/* Floating Badge 1 (Top Left): Bollywood VFX */}
-                <div className="absolute -top-3 -left-2 sm:-left-6 bg-white/95 backdrop-blur-md px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-lg flex items-center gap-2 sm:gap-2.5 animate-bounce [animation-duration:5s]">
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
-                    <Film size={14} />
-                  </div>
+        {/* Mobile Curved Fanned 5-Card Deck (Matches Desktop Curve, Zero Text Clipping) */}
+        <div className="md:hidden mt-6 pt-4 pb-8 flex items-end justify-center overflow-hidden">
+          <div className="flex items-end justify-center -space-x-4 px-1">
+            {DECK_CARDS.map((card, idx) => {
+              const mobileRot = card.baseRotate * 0.8;
+              const mobileY = card.baseY * 0.5;
+              return (
+                <div
+                  key={card.id}
+                  onClick={() => onPlayReel(card.youtubeId, card.title)}
+                  role="button"
+                  tabIndex={0}
+                  style={{
+                    zIndex: card.zIndex,
+                    transformOrigin: 'bottom center',
+                    transform: entered
+                      ? `translate3d(0, ${mobileY}px, 0) rotate(${mobileRot}deg) scale(${card.isCenter ? 1.08 : 0.95})`
+                      : `translate3d(${card.entryX * 0.35}px, ${card.entryY * 0.4}px, 0) rotate(${card.entryRotate}deg) scale(0.75)`,
+                    opacity: entered ? 1 : 0,
+                    transitionProperty: 'transform, opacity',
+                    transitionDuration: '800ms',
+                    transitionDelay: `${idx * 55}ms`,
+                    transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                    boxShadow: '0 14px 28px -8px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35)',
+                  }}
+                  className={`relative w-[84px] h-36 rounded-2xl p-2 flex flex-col justify-between border border-white/25 ${card.bgClass}`}
+                >
                   <div>
-                    <span className="block text-[10px] sm:text-[11px] font-bold text-slate-900 leading-tight">
-                      Brahmāstra & Kalki
-                    </span>
-                    <span className="text-[9px] sm:text-[10px] text-slate-500">VFX Credits</span>
+                    <div className={`text-[9.5px] font-semibold leading-tight ${card.textClass}`}>
+                      {card.title}
+                    </div>
+                  </div>
+
+                  <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black/30 border border-white/25">
+                    <img
+                      src={`https://img.youtube.com/vi/${card.youtubeId}/mqdefault.jpg`}
+                      alt={card.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/15 flex items-center justify-center">
+                      <div className="w-6 h-6 rounded-full bg-white/95 text-[#111111] flex items-center justify-center">
+                        <Play size={10} className="fill-[#111111] translate-x-0.5" />
+                      </div>
+                    </div>
                   </div>
                 </div>
+              );
+            })}
+          </div>
+        </div>
 
-                {/* Floating Badge 2 (Bottom Right): Global Animation */}
-                <div className="absolute -bottom-3 -right-2 sm:-right-4 bg-white/95 backdrop-blur-md px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-lg flex items-center gap-2 sm:gap-2.5">
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 shrink-0">
-                    <Clapperboard size={14} />
-                  </div>
-                  <div>
-                    <span className="block text-[10px] sm:text-[11px] font-bold text-slate-900 leading-tight">
-                      Disney & Netflix
-                    </span>
-                    <span className="text-[9px] sm:text-[10px] text-slate-500">3D Animator</span>
-                  </div>
-                </div>
-              </div>
-            </Reveal>
+        {/* Mobile Bottom Factual Production Strip (Fills Mobile Hero Cleanly) */}
+        <div className="md:hidden mt-2 pt-4 border-t border-white/[0.08] grid grid-cols-3 gap-2 text-center">
+          <div>
+            <div className="text-sm font-semibold text-white tabular-nums">6+ yrs</div>
+            <div className="text-[10px] text-[#8E8E93]">Experience</div>
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-white tabular-nums">5 Films</div>
+            <div className="text-[10px] text-[#8E8E93]">Bollywood VFX</div>
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-white tabular-nums">4 Series</div>
+            <div className="text-[10px] text-[#8E8E93]">Disney &amp; Netflix</div>
           </div>
         </div>
       </div>

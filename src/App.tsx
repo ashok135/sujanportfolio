@@ -1,16 +1,18 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { VideoEditingSection } from './components/VideoEditingSection';
-import { VfxAnimationSection } from './components/VfxAnimationSection';
+import { SelectedWorks } from './components/SelectedWorks';
+import { ProductionCredits } from './components/ProductionCredits';
 import { SkillsMatrix } from './components/SkillsMatrix';
 import { ExperienceTimeline } from './components/ExperienceTimeline';
-import { AboutSection } from './components/AboutSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { VideoModal } from './components/VideoModal';
+import { ResumeModal } from './components/ResumeModal';
+import { Preloader } from './components/Preloader';
 
 export function App() {
+  const [introDone, setIntroDone] = useState(false);
   const [videoModal, setVideoModal] = useState<{
     isOpen: boolean;
     youtubeId: string | null;
@@ -20,6 +22,12 @@ export function App() {
     youtubeId: null,
     title: null,
   });
+
+  const [resumeModalOpen, setResumeModalOpen] = useState(false);
+
+  const handleIntroComplete = useCallback(() => {
+    setIntroDone(true);
+  }, []);
 
   const handlePlayVideo = (youtubeId: string, title: string) => {
     setVideoModal({
@@ -45,45 +53,40 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFCF9] text-slate-800 flex flex-col selection:bg-amber-100 selection:text-amber-900 overflow-x-hidden">
-      {/* 1. Floating Glass Navigation */}
-      <Navbar onOpenContact={handleOpenContact} />
+    <div className="min-h-screen bg-[#111111] text-[#F4F4F5] flex flex-col overflow-x-clip">
+      <Preloader onComplete={handleIntroComplete} />
+
+      <Navbar
+        onOpenContact={handleOpenContact}
+        onOpenResume={() => setResumeModalOpen(true)}
+      />
 
       <main className="flex-1">
-        {/* 2. Hero Section */}
         <Hero
           onPlayReel={handlePlayVideo}
           onOpenContact={handleOpenContact}
+          onOpenResume={() => setResumeModalOpen(true)}
+          ready={introDone}
         />
-
-        {/* 3. Section 01: Video Editing & Post-Production (with Before/After Lab) */}
-        <VideoEditingSection onPlayVideo={handlePlayVideo} />
-
-        {/* 4. Section 02: CGI, VFX & 3D Animation (with Bollywood & Disney/Netflix) */}
-        <VfxAnimationSection onPlayVideo={handlePlayVideo} />
-
-        {/* 5. Technical Skills & AI Matrix */}
+        <SelectedWorks onPlayVideo={handlePlayVideo} />
+        <ProductionCredits />
         <SkillsMatrix />
-
-        {/* 6. Career Milestones & Timeline */}
         <ExperienceTimeline />
-
-        {/* 7. Artistic Statement & Pillars */}
-        <AboutSection />
-
-        {/* 8. Direct Contact & Project Briefing */}
-        <ContactSection />
+        <ContactSection onOpenResume={() => setResumeModalOpen(true)} />
       </main>
 
-      {/* 9. Editorial Footer */}
-      <Footer />
+      <Footer onOpenResume={() => setResumeModalOpen(true)} />
 
-      {/* 10. Embedded YouTube Video Modal */}
       <VideoModal
         isOpen={videoModal.isOpen}
         youtubeId={videoModal.youtubeId}
         title={videoModal.title}
         onClose={handleCloseModal}
+      />
+
+      <ResumeModal
+        isOpen={resumeModalOpen}
+        onClose={() => setResumeModalOpen(false)}
       />
     </div>
   );
