@@ -198,7 +198,6 @@ export const HangingIdCard: React.FC = () => {
           strokeWidth="3.5"
           strokeOpacity="0.75"
           strokeLinecap="butt"
-          strokeDasharray="6 8"
         />
         <text
           fill="#FACC15"
