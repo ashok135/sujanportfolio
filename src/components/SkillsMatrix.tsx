@@ -232,14 +232,14 @@ export const SkillsMatrix: React.FC = () => {
       className="py-20 sm:py-32 border-t border-white/[0.08] bg-[#111111] overflow-hidden"
     >
       <div className="w-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 xl:px-20">
-        <div className="mb-16 sm:mb-24">
+        <div className="mb-16 sm:mb-24 text-center max-w-2xl mx-auto">
           <span className="text-xs font-medium uppercase tracking-widest text-[#FACC15]">
             Skills &amp; Software
           </span>
           <h2 className="text-2xl sm:text-5xl font-semibold text-white mt-2">
             This Is My Craft
           </h2>
-          <p className="text-sm text-[#8E8E93] mt-3 max-w-xl leading-relaxed">
+          <p className="text-sm text-[#8E8E93] mt-3 max-w-xl mx-auto leading-relaxed">
             {personal.fullBio}
           </p>
         </div>
