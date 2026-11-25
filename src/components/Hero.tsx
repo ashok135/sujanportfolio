@@ -109,8 +109,8 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
   const mobileCardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const heroSectionRef = useRef<HTMLElement | null>(null);
   const heroInnerRef = useRef<HTMLDivElement | null>(null);
-  const leftBadgeRef = useRef<HTMLDivElement | null>(null);
-  const rightBadgeRef = useRef<HTMLDivElement | null>(null);
+  const leftCursorRef = useRef<SVGSVGElement | null>(null);
+  const rightCursorRef = useRef<SVGSVGElement | null>(null);
   const [entered, setEntered] = useState(false);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
@@ -206,11 +206,11 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
       curRX += (targetRX - curRX) * 0.06;
       curRY += (targetRY - curRY) * 0.06;
 
-      if (leftBadgeRef.current) {
-        leftBadgeRef.current.style.transform = `translate3d(${curLX.toFixed(2)}px, ${curLY.toFixed(2)}px, 0)`;
+      if (leftCursorRef.current) {
+        leftCursorRef.current.style.transform = `translate3d(${curLX.toFixed(2)}px, ${curLY.toFixed(2)}px, 0)`;
       }
-      if (rightBadgeRef.current) {
-        rightBadgeRef.current.style.transform = `translate3d(${curRX.toFixed(2)}px, ${curRY.toFixed(2)}px, 0)`;
+      if (rightCursorRef.current) {
+        rightCursorRef.current.style.transform = `translate3d(${curRX.toFixed(2)}px, ${curRY.toFixed(2)}px, 0)`;
       }
 
       const settled =
@@ -239,10 +239,10 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
       const my = e.clientY - rect.top;
 
       targetLX = mx - 135;
-      targetLY = my - 108;
+      targetLY = my - 78;
 
       targetRX = mx - (rect.width - 145);
-      targetRY = my - 118;
+      targetRY = my - 138;
       startLoop();
     };
 
@@ -274,25 +274,33 @@ export const Hero: React.FC<HeroProps> = ({ onPlayReel, onOpenResume, ready = tr
         ref={heroInnerRef}
         className="w-full px-5 sm:px-8 lg:px-14 xl:px-20 relative flex-1 flex flex-col justify-between md:block"
       >
-        {/* Left Floating Cursor Badge */}
-        <div
-          ref={leftBadgeRef}
-          className="hidden lg:flex items-center gap-1 absolute left-6 top-20 z-30 pointer-events-none select-none will-change-transform"
-        >
+        {/* Left Floating Chip + Roaming Mouse Pointer Symbol */}
+        <div className="hidden lg:flex items-center gap-1 absolute left-6 top-20 z-30 pointer-events-none select-none">
           <span className="px-3.5 py-1 rounded-full bg-[#4DB6AC] text-[#0A2220] text-xs font-semibold shadow-md">
             Premiere Pro
           </span>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="-mt-4 -ml-1 text-[#4DB6AC]">
+          <svg
+            ref={leftCursorRef}
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            className="-mt-4 -ml-1 text-[#4DB6AC] will-change-transform"
+          >
             <path d="M2 2L14 7L8 9L6 14L2 2Z" fill="currentColor" />
           </svg>
         </div>
 
-        {/* Right Floating Cursor Badge */}
-        <div
-          ref={rightBadgeRef}
-          className="hidden lg:flex items-center gap-1 absolute right-6 top-36 z-30 pointer-events-none select-none will-change-transform"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="-mt-4 -mr-1 text-[#F08080]">
+        {/* Right Floating Chip + Roaming Mouse Pointer Symbol */}
+        <div className="hidden lg:flex items-center gap-1 absolute right-6 top-36 z-30 pointer-events-none select-none">
+          <svg
+            ref={rightCursorRef}
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            className="-mt-4 -mr-1 text-[#F08080] will-change-transform"
+          >
             <path d="M14 2L2 7L8 9L10 14L14 2Z" fill="currentColor" />
           </svg>
           <span className="px-3.5 py-1 rounded-full bg-[#F08080] text-[#2A0B0B] text-xs font-semibold shadow-md">
